@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { savePet } from '../lib/api'
-import { CameraIcon } from '../components/Icons'
+import { CameraIcon, CloseIcon, PlusIcon } from '../components/Icons'
 import { TEMPERAMENTS, breedTypeLabel, purposeLabel, sociabilityLabel } from '../lib/labels'
 import type { Pet, PetInput, User } from '../lib/types'
 
@@ -10,6 +10,7 @@ const SEX: Opt<NonNullable<PetInput['sex']>>[] = [['male', 'Macho'], ['female', 
 const BREED_TYPE = Object.entries(breedTypeLabel) as Opt<NonNullable<PetInput['breed_type']>>[]
 const PURPOSE = Object.entries(purposeLabel) as Opt<NonNullable<PetInput['purpose']>>[]
 const SOCIABILITY = Object.entries(sociabilityLabel) as Opt<NonNullable<PetInput['sociability']>>[]
+const MAX_EXTRA = 5
 const YES_NO: Opt<boolean>[] = [[true, 'Sim'], [false, 'Não']]
 
 // Botões de escolha única; tocar de novo na opção marcada limpa a resposta
@@ -42,6 +43,7 @@ export function PetForm({ user, pet, onSaved }: Props) {
     city: pet?.city ?? '',
     bio: pet?.bio ?? '',
     photo_url: pet?.photo_url ?? null,
+    photos: pet?.photos ?? [],
     temperament: pet?.temperament ?? [],
     purpose: pet?.purpose ?? null,
     sociability: pet?.sociability ?? null,
@@ -54,12 +56,15 @@ export function PetForm({ user, pet, onSaved }: Props) {
     has_offspring: pet?.has_offspring ?? null,
   })
   const [photo, setPhoto] = useState<File | null>(null)
+  const [extra, setExtra] = useState<File[]>([])
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
   const set = <K extends keyof PetInput>(k: K, v: PetInput[K]) => setForm((f) => ({ ...f, [k]: v }))
   const toggleTemper = (t: string) => set('temperament', form.temperament.includes(t) ? form.temperament.filter((x) => x !== t) : [...form.temperament, t])
   const preview = photo ? URL.createObjectURL(photo) : form.photo_url
+  const room = MAX_EXTRA - form.photos.length - extra.length
+  const addExtra = (files: FileList | null) => files && setExtra((x) => [...x, ...Array.from(files)].slice(0, MAX_EXTRA - form.photos.length))
   const mixed = form.breed_type === 'mixed'
   const purebred = form.breed_type === 'purebred'
   const female = form.sex === 'female'
@@ -81,7 +86,7 @@ export function PetForm({ user, pet, onSaved }: Props) {
         times_bred: female ? form.times_bred : null,
         has_offspring: female ? form.has_offspring : null,
       }
-      onSaved(await savePet(user, clean, photo, pet))
+      onSaved(await savePet(user, clean, photo, pet, extra))
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -98,6 +103,30 @@ export function PetForm({ user, pet, onSaved }: Props) {
         {preview && <span className="photo-change"><CameraIcon /> Trocar</span>}
         <input type="file" accept="image/*" hidden onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} />
       </label>
+
+      <fieldset className="field">
+        <legend>Mais fotos ({form.photos.length + extra.length}/{MAX_EXTRA})</legend>
+        <div className="thumbs">
+          {form.photos.map((src) => (
+            <div key={src} className="thumb">
+              <img src={src} alt="Foto extra do pet" />
+              <button type="button" aria-label="Remover foto" onClick={() => set('photos', form.photos.filter((p) => p !== src))}><CloseIcon size={14} /></button>
+            </div>
+          ))}
+          {extra.map((f, i) => (
+            <div key={f.name + i} className="thumb">
+              <img src={URL.createObjectURL(f)} alt="Nova foto do pet" />
+              <button type="button" aria-label="Remover foto" onClick={() => setExtra((x) => x.filter((_, j) => j !== i))}><CloseIcon size={14} /></button>
+            </div>
+          ))}
+          {room > 0 && (
+            <label className="thumb add" aria-label="Adicionar fotos">
+              <PlusIcon />
+              <input type="file" accept="image/*" multiple hidden onChange={(e) => { addExtra(e.target.files); e.target.value = '' }} />
+            </label>
+          )}
+        </div>
+      </fieldset>
 
       <h2 className="form-section">Sobre o pet</h2>
       <div className="field">

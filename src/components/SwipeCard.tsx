@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import type { Pet } from '../lib/types'
-import { CloseIcon, HeartIcon, PinIcon } from './Icons'
+import { CloseIcon, HeartIcon, InfoIcon, PinIcon } from './Icons'
+import { PetSheet } from './PetSheet'
 import { cardFacts, speciesLabel } from '../lib/labels'
 
 const THRESHOLD = 110
@@ -15,6 +16,7 @@ export function SwipeCard({ pet, next, onSwipe }: Props) {
   const [dx, setDx] = useState(0)
   const [leaving, setLeaving] = useState<null | boolean>(null)
   const [dragging, setDragging] = useState(false)
+  const [open, setOpen] = useState(false)
   const start = useRef<number | null>(null)
 
   const finish = (liked: boolean) => {
@@ -33,10 +35,15 @@ export function SwipeCard({ pet, next, onSwipe }: Props) {
     if (start.current !== null) setDx(e.clientX - start.current)
   }
   const onPointerUp = () => {
+    const wasDrag = start.current !== null
     start.current = null
     setDragging(false)
     if (Math.abs(dx) > THRESHOLD) finish(dx > 0)
-    else setDx(0)
+    else {
+      setDx(0)
+      // toque sem arrastar abre a ficha
+      if (wasDrag && Math.abs(dx) < 6 && leaving === null) setOpen(true)
+    }
   }
 
   const x = leaving === null ? dx : leaving ? 640 : -640
@@ -67,6 +74,7 @@ export function SwipeCard({ pet, next, onSwipe }: Props) {
           ) : (
             <div className="card-placeholder">{pet.name[0]}</div>
           )}
+          <button className="info-btn" aria-label={`Ver mais sobre ${pet.name}`} onPointerDown={(e) => e.stopPropagation()} onClick={() => setOpen(true)}><InfoIcon /></button>
           <span className="stamp like" style={{ opacity: Math.max(0, x / THRESHOLD) }}>Au</span>
           <span className="stamp nope" style={{ opacity: Math.max(0, -x / THRESHOLD) }}>Passo</span>
           <div className="card-info">
@@ -88,6 +96,7 @@ export function SwipeCard({ pet, next, onSwipe }: Props) {
           </div>
         </article>
       </div>
+      {open && <PetSheet pet={pet} onClose={() => setOpen(false)} onDecide={(liked) => { setOpen(false); finish(liked) }} />}
       <div className="actions">
         <button className="round nope" aria-label="Passar" onClick={() => finish(false)}>
           <CloseIcon />

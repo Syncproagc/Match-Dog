@@ -22,6 +22,7 @@
   --ease: cubic-bezier(.22,1,.36,1);
   --z-nav: 10;
   --z-overlay: 20;
+  --z-sheet: 30;
   font-family: var(--font-body);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
@@ -408,3 +409,39 @@ nav button:active { transform: scale(0.94); }
 .card-info { gap: 6px; }
 .card-info .tags { gap: 5px; }
 .card-info .tags li { font-size: 12.5px; padding: 4px 10px; }
+
+/* Ficha aberta ao tocar no card */
+.info-btn { position: absolute; top: 14px; right: 14px; width: 38px; height: 38px; border-radius: 50%; border: 0; display: grid; place-items: center; color: #fff; background: rgb(20 12 8 / 0.4); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.25); transition: transform 0.2s var(--ease), background 0.2s; }
+.info-btn:hover { background: rgb(20 12 8 / 0.6); transform: scale(1.08); }
+.card { cursor: pointer; }
+.sheet-backdrop { position: fixed; inset: 0; z-index: var(--z-sheet); display: flex; align-items: flex-end; justify-content: center; background: rgb(20 12 8 / 0.5); backdrop-filter: blur(6px); animation: fade 0.25s ease; }
+.sheet { position: relative; width: 100%; max-width: 480px; max-height: 94dvh; display: flex; flex-direction: column; border-radius: var(--r-xl) var(--r-xl) 0 0; background: var(--bg); box-shadow: 0 -30px 60px -20px rgb(0 0 0 / 0.5); overflow: hidden; animation: slide-up 0.45s var(--ease); }
+@keyframes slide-up { from { transform: translateY(100%); } }
+.sheet-close { position: absolute; top: 14px; right: 14px; z-index: 2; width: 38px; height: 38px; border-radius: 50%; border: 0; display: grid; place-items: center; color: #fff; background: rgb(20 12 8 / 0.5); backdrop-filter: blur(12px); }
+.sheet-scroll { overflow-y: auto; overscroll-behavior: contain; flex: 1; }
+.gallery { position: relative; }
+.gallery-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.gallery-track::-webkit-scrollbar { display: none; }
+.gallery-track img { flex: 0 0 100%; width: 100%; aspect-ratio: 4 / 5; max-height: 60dvh; object-fit: cover; scroll-snap-align: center; display: block; }
+.gallery-empty { aspect-ratio: 4 / 3; display: grid; place-items: center; font-family: var(--font-display); font-size: 96px; font-weight: 800; color: var(--muted); background: var(--sunken); }
+.gallery-dots { position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 6px; }
+.gallery-dots i { width: 7px; height: 7px; border-radius: 50%; background: rgb(255 255 255 / 0.5); transition: width 0.3s var(--ease), background 0.3s; }
+.gallery-dots i.on { width: 22px; border-radius: 999px; background: #fff; }
+.sheet-body { padding: 20px 20px 16px; display: flex; flex-direction: column; gap: 10px; }
+.sheet-name { font-size: 40px; font-weight: 800; display: flex; align-items: baseline; gap: 10px; }
+.sheet-name small { font-family: var(--font-body); font-size: 24px; font-weight: 400; color: var(--muted); }
+.sheet-body h3 { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin: 10px 0 0; }
+.sheet-bio { margin: 0; max-width: 60ch; }
+.city.muted { opacity: 1; }
+.chips-static { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; }
+.chips-static li { padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.sheet-actions { display: flex; justify-content: center; gap: 28px; padding: 12px 20px calc(14px + env(safe-area-inset-bottom, 0px)); background: var(--glass); backdrop-filter: blur(18px); box-shadow: 0 -1px 0 var(--glass-line); }
+@media (min-width: 560px) { .sheet-backdrop { align-items: center; } .sheet { border-radius: var(--r-xl); max-height: 90dvh; } }
+
+/* Fotos extras no formulário */
+.thumbs { display: flex; flex-wrap: wrap; gap: 10px; }
+.thumb { position: relative; width: 76px; aspect-ratio: 1; border-radius: var(--r-sm); overflow: hidden; background: var(--sunken); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb button { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; border: 0; display: grid; place-items: center; color: #fff; background: rgb(20 12 8 / 0.6); }
+.thumb.add { display: grid; place-items: center; cursor: pointer; color: var(--muted); background: var(--glass); box-shadow: inset 0 0 0 1.5px var(--border); transition: color 0.2s, box-shadow 0.2s; }
+.thumb.add:hover { color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }

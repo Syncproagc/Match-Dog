@@ -88,7 +88,7 @@ export async function signOut() {
 }
 
 export async function getMyPet(user: User): Promise<Pet | null> {
-  if (!supabase) { const p = load().myPet; return p && { ...p, temperament: p.temperament ?? [] } }
+  if (!supabase) { const p = load().myPet; return p && { ...p, temperament: p.temperament ?? [], photos: p.photos ?? [] } }
   const { data, error } = await supabase
     .from('pets')
     .select('*')
@@ -100,10 +100,11 @@ export async function getMyPet(user: User): Promise<Pet | null> {
   return data
 }
 
-export async function savePet(user: User, input: PetInput, photo: File | null, existing: Pet | null): Promise<Pet> {
+export async function savePet(user: User, input: PetInput, photo: File | null, existing: Pet | null, extra: File[] = []): Promise<Pet> {
   if (!supabase) {
     const photo_url = photo ? await fileToDataUrl(photo) : input.photo_url
-    const pet: Pet = { ...input, photo_url, id: existing?.id ?? 'my-pet', owner_id: user.id }
+    const photos = [...input.photos, ...(await Promise.all(extra.map(fileToDataUrl)))]
+    const pet: Pet = { ...input, photo_url, photos, id: existing?.id ?? 'my-pet', owner_id: user.id }
     save({ ...load(), myPet: pet })
     return pet
   }
@@ -114,7 +115,14 @@ export async function savePet(user: User, input: PetInput, photo: File | null, e
     if (up.error) throw up.error
     photo_url = supabase.storage.from('pet-photos').getPublicUrl(path).data.publicUrl
   }
-  const row = { ...input, photo_url, owner_id: user.id }
+  const photos = [...input.photos]
+  for (const f of extra) {
+    const path = `${user.id}/${crypto.randomUUID()}-${f.name}`
+    const up = await supabase.storage.from('pet-photos').upload(path, f)
+    if (up.error) throw up.error
+    photos.push(supabase.storage.from('pet-photos').getPublicUrl(path).data.publicUrl)
+  }
+  const row = { ...input, photo_url, photos, owner_id: user.id }
   const q = existing
     ? supabase.from('pets').update(row).eq('id', existing.id)
     : supabase.from('pets').insert(row)

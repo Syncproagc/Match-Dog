@@ -10,3 +10,6 @@ alter table public.pets
   add column registry text,
   add column times_bred int check (times_bred >= 0),
   add column has_offspring boolean;
+
+-- Fotos extras (a principal continua em photo_url)
+alter table public.pets add column photos text[] not null default '{}';

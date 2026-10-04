@@ -25,6 +25,7 @@ export interface Pet {
   times_bred: number | null
   has_offspring: boolean | null
   photo_url: string | null
+  photos: string[]
 }
 
 export type PetInput = Omit<Pet, 'id' | 'owner_id'>
