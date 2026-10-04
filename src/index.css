@@ -349,3 +349,35 @@ nav button:active { transform: scale(0.94); }
 .mini-card { animation: float 6s ease-in-out infinite; }
 .mini-card.c2 { animation-delay: -2s; } .mini-card.c3 { animation-delay: -4s; }
 @keyframes float { 50% { translate: 0 -8px; } }
+
+/* Formulário */
+.field { display: flex; flex-direction: column; gap: 6px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.field.grow { flex: 1; }
+.field.age { flex: 0 0 96px; }
+.field label, .field legend { font-size: 13px; font-weight: 600; color: var(--muted); padding: 0; letter-spacing: 0.01em; }
+.segmented { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--glass); box-shadow: inset 0 0 0 1px var(--glass-line); backdrop-filter: blur(10px); }
+.segmented button { flex: 1; border: 0; background: none; padding: 10px 8px; border-radius: 999px; font-weight: 500; font-size: 15px; color: var(--muted); transition: background 0.3s var(--ease), color 0.3s, box-shadow 0.3s, transform 0.2s; }
+.segmented button:hover { color: var(--text); }
+.segmented button:active { transform: scale(0.96); }
+.segmented button.on { background: var(--accent); color: var(--accent-ink); box-shadow: 0 8px 16px -8px rgb(217 88 63 / 0.7); }
+.photo-pick { position: relative; height: 280px; border-radius: var(--r-xl); }
+.photo-change { position: absolute; right: 12px; bottom: 12px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #fff; background: rgb(20 12 8 / 0.5); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.2); }
+.photo-change svg { width: 16px; height: 16px; }
+.pick-empty { padding: 20px; }
+
+/* Match: confete */
+.overlay { overflow: hidden; }
+.overlay > :not(.confetti) { position: relative; z-index: 1; }
+.confetti { position: absolute; top: -24px; width: 9px; height: 16px; border-radius: 3px; opacity: 0; animation: fall linear infinite; }
+.confetti.c0 { background: #f2b25c; } .confetti.c1 { background: #fff7f0; } .confetti.c2 { background: #9cc7b4; } .confetti.c3 { background: #ff9a85; }
+@keyframes fall { 0% { opacity: 1; transform: translateY(0) rotate(0); } 100% { opacity: 1; transform: translateY(110dvh) rotate(540deg); } }
+@media (prefers-reduced-motion: reduce) { .confetti { display: none; } }
+
+/* Estado vazio com ilustração */
+.empty { align-items: center; text-align: center; }
+.empty-art { position: relative; width: 140px; height: 120px; margin-bottom: 12px; }
+.empty-art span { position: absolute; width: 84px; aspect-ratio: 3 / 4; border-radius: 18px; }
+.empty-art span:nth-child(1) { left: 0; top: 14px; rotate: -12deg; background: linear-gradient(160deg, #f2b25c, #d9583f); opacity: 0.6; }
+.empty-art span:nth-child(2) { right: 0; top: 6px; rotate: 10deg; background: linear-gradient(160deg, #9cc7b4, #3f8f7a); opacity: 0.6; }
+.empty-art span:nth-child(3) { left: 28px; top: 0; display: grid; place-items: center; background: var(--glass); backdrop-filter: blur(10px); box-shadow: inset 0 0 0 1px var(--glass-line), 0 16px 28px -14px rgb(var(--shadow) / 0.5); animation: float 6s ease-in-out infinite; }
+.empty-art svg { width: 34px; height: 34px; }

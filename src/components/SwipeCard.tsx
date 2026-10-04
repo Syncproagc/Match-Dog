@@ -21,6 +21,7 @@ export function SwipeCard({ pet, next, onSwipe }: Props) {
   const finish = (liked: boolean) => {
     if (leaving !== null) return
     setLeaving(liked)
+    navigator.vibrate?.(liked ? [12, 40, 12] : 8)
     setTimeout(() => onSwipe(liked), 280)
   }
 
