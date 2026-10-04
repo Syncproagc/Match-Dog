@@ -3,6 +3,9 @@ import { savePet } from '../lib/api'
 import { CameraIcon } from '../components/Icons'
 import type { Pet, PetInput, User } from '../lib/types'
 
+const SPECIES: [PetInput['species'], string][] = [['dog', 'Cachorro'], ['cat', 'Gato'], ['other', 'Outro']]
+const SEX: [NonNullable<PetInput['sex']>, string][] = [['male', 'Macho'], ['female', 'Fêmea']]
+
 interface Props {
   user: User
   pet: Pet | null
@@ -47,33 +50,47 @@ export function PetForm({ user, pet, onSaved }: Props) {
       {!pet && <p className="muted lede">É assim que outros donos vão ver seu pet. Dá para mudar depois.</p>}
       <label className="photo-pick">
         {preview ? <img src={preview} alt="Foto do seu pet" /> : <span className="pick-empty"><CameraIcon />Adicionar foto</span>}
+        {preview && <span className="photo-change"><CameraIcon /> Trocar</span>}
         <input type="file" accept="image/*" hidden onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} />
       </label>
-      <input id="pet-name" aria-label="Nome" placeholder="Nome" required value={form.name} onChange={(e) => set('name', e.target.value)} />
-      <div className="row">
-        <select id="pet-species" aria-label="Espécie" value={form.species} onChange={(e) => set('species', e.target.value as PetInput['species'])}>
-          <option value="dog">Cachorro</option>
-          <option value="cat">Gato</option>
-          <option value="other">Outro</option>
-        </select>
-        <select id="pet-sex" aria-label="Sexo" value={form.sex ?? ''} onChange={(e) => set('sex', (e.target.value || null) as PetInput['sex'])}>
-          <option value="">Sexo</option>
-          <option value="male">Macho</option>
-          <option value="female">Fêmea</option>
-        </select>
+      <div className="field">
+        <label htmlFor="pet-name">Nome</label>
+        <input id="pet-name" placeholder="Como ele se chama?" required value={form.name} onChange={(e) => set('name', e.target.value)} />
       </div>
+      <fieldset className="field">
+        <legend>Espécie</legend>
+        <div className="segmented" role="radiogroup" aria-label="Espécie">
+          {SPECIES.map(([v, l]) => (
+            <button key={v} type="button" role="radio" aria-checked={form.species === v} className={form.species === v ? 'on' : ''} onClick={() => set('species', v)}>{l}</button>
+          ))}
+        </div>
+      </fieldset>
+      <fieldset className="field">
+        <legend>Sexo</legend>
+        <div className="segmented" role="radiogroup" aria-label="Sexo">
+          {SEX.map(([v, l]) => (
+            <button key={v} type="button" role="radio" aria-checked={form.sex === v} className={form.sex === v ? 'on' : ''} onClick={() => set('sex', form.sex === v ? null : v)}>{l}</button>
+          ))}
+        </div>
+      </fieldset>
       <div className="row">
-        <input id="pet-breed" aria-label="Raça" placeholder="Raça" value={form.breed ?? ''} onChange={(e) => set('breed', e.target.value)} />
-        <input
-          type="number"
-          min={0}
-          id="pet-age" aria-label="Idade" placeholder="Idade"
-          value={form.age_years ?? ''}
-          onChange={(e) => set('age_years', e.target.value === '' ? null : Number(e.target.value))}
-        />
+        <div className="field grow">
+          <label htmlFor="pet-breed">Raça</label>
+          <input id="pet-breed" placeholder="Ex.: Beagle" value={form.breed ?? ''} onChange={(e) => set('breed', e.target.value)} />
+        </div>
+        <div className="field age">
+          <label htmlFor="pet-age">Idade</label>
+          <input type="number" min={0} id="pet-age" placeholder="Anos" value={form.age_years ?? ''} onChange={(e) => set('age_years', e.target.value === '' ? null : Number(e.target.value))} />
+        </div>
       </div>
-      <input id="pet-city" aria-label="Cidade" placeholder="Cidade" value={form.city ?? ''} onChange={(e) => set('city', e.target.value)} />
-      <textarea id="pet-bio" aria-label="Sobre" placeholder="Conte um pouco sobre seu pet" rows={3} value={form.bio ?? ''} onChange={(e) => set('bio', e.target.value)} />
+      <div className="field">
+        <label htmlFor="pet-city">Cidade</label>
+        <input id="pet-city" placeholder="Onde vocês moram" value={form.city ?? ''} onChange={(e) => set('city', e.target.value)} />
+      </div>
+      <div className="field">
+        <label htmlFor="pet-bio">Sobre</label>
+        <textarea id="pet-bio" placeholder="Conte um pouco sobre seu pet" rows={3} value={form.bio ?? ''} onChange={(e) => set('bio', e.target.value)} />
+      </div>
       {error && <p className="error">{error}</p>}
       <button type="button" className="primary" disabled={busy} onClick={() => submit()}>{busy ? 'Salvando...' : 'Salvar'}</button>
     </form>

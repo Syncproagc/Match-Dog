@@ -21,6 +21,7 @@ export function SwipeCard({ pet, next, onSwipe }: Props) {
   const finish = (liked: boolean) => {
     if (leaving !== null) return
     setLeaving(liked)
+    navigator.vibrate?.(liked ? [12, 40, 12] : 8)
     setTimeout(() => onSwipe(liked), 280)
   }
 
@@ -41,7 +42,7 @@ export function SwipeCard({ pet, next, onSwipe }: Props) {
 
   const x = leaving === null ? dx : leaving ? 640 : -640
   const progress = Math.min(1, Math.abs(x) / THRESHOLD)
-  const tags = [pet.breed, pet.sex && sexLabel[pet.sex], pet.age_years != null && `${pet.age_years} ${pet.age_years === 1 ? 'ano' : 'anos'}`].filter(Boolean)
+  const tags = [pet.breed, pet.sex && sexLabel[pet.sex]].filter(Boolean)
 
   return (
     <div className="deck-wrap">
@@ -71,7 +72,7 @@ export function SwipeCard({ pet, next, onSwipe }: Props) {
           <span className="stamp nope" style={{ opacity: Math.max(0, -x / THRESHOLD) }}>Passo</span>
           <div className="card-info">
             <p className="eyebrow">{speciesLabel[pet.species]}</p>
-            <h2>{pet.name}</h2>
+            <h2>{pet.name}{pet.age_years != null && <small>{pet.age_years}</small>}</h2>
             {tags.length > 0 && (
               <ul className="tags">
                 {tags.map((t) => (
