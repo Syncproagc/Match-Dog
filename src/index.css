@@ -11,10 +11,11 @@
   color: var(--text);
 }
 @media (prefers-color-scheme: dark) {
-  :root { --bg: #17121a; --surface: #241d27; --text: #f5eef2; --muted: #a497a0; --border: #3a2f3d; }
+  :root:not([data-theme='light']) { --bg: #17121a; --surface: #241d27; --text: #f5eef2; --muted: #a497a0; --border: #3a2f3d; color-scheme: dark; }
 }
+:root[data-theme='dark'] { --bg: #17121a; --surface: #241d27; --text: #f5eef2; --muted: #a497a0; --border: #3a2f3d; color-scheme: dark; }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--text); }
 button { font: inherit; cursor: pointer; }
 input, select, textarea {
   font: inherit; width: 100%; padding: 12px 14px; border-radius: 12px;
