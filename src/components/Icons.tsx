@@ -81,3 +81,15 @@ export const FilterIcon = () => (
     <circle cx="8" cy="17" r="2" />
   </svg>
 )
+
+export const BackIcon = () => (
+  <svg {...base} width={22} height={22}>
+    <path d="M15 5l-7 7 7 7" />
+  </svg>
+)
+
+export const SendIcon = () => (
+  <svg {...base} width={20} height={20}>
+    <path d="M4 12l16-8-6 16-3-7z" />
+  </svg>
+)

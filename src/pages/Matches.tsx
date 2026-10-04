@@ -1,14 +1,23 @@
 import { useEffect, useState } from 'react'
-import { getMatches } from '../lib/api'
-import type { Pet } from '../lib/types'
+import { Chat } from '../components/Chat'
+import { getLastMessages, getMatches } from '../lib/api'
+import { breedLabel } from '../lib/labels'
+import type { Message, Pet } from '../lib/types'
 
 export function Matches({ myPet }: { myPet: Pet }) {
   const [list, setList] = useState<Pet[] | null>(null)
   const [error, setError] = useState('')
+  const [open, setOpen] = useState<Pet | null>(null)
+  const [last, setLast] = useState<Record<string, Message>>({})
 
   useEffect(() => {
     getMatches(myPet).then(setList, (e) => setError(e.message))
   }, [myPet])
+
+  // Recarrega a prévia das conversas sempre que o chat fecha
+  useEffect(() => {
+    if (!open) getLastMessages(myPet).then(setLast, () => {})
+  }, [myPet, open])
 
   if (error) return <p className="error page">{error}</p>
   if (!list)
@@ -31,14 +40,17 @@ export function Matches({ myPet }: { myPet: Pet }) {
       <ul className="matches">
       {list.map((p, i) => (
         <li key={p.id} style={{ '--i': i } as React.CSSProperties}>
-          <img src={p.photo_url ?? ''} alt={`Foto de ${p.name}`} />
-          <div>
-            <strong>{p.name}</strong>
-            <span className="muted">{[p.breed, p.city].filter(Boolean).join(' · ')}</span>
-          </div>
+          <button type="button" className="match-tile" onClick={() => setOpen(p)} aria-label={`Conversar com ${p.name}`}>
+            <img src={p.photo_url ?? ''} alt={`Foto de ${p.name}`} />
+            <div>
+              <strong>{p.name}</strong>
+              <span>{last[p.id] ? `${last[p.id].from_pet_id === myPet.id ? 'Você: ' : ''}${last[p.id].body}` : [breedLabel(p), p.city].filter(Boolean).join(' · ')}</span>
+            </div>
+          </button>
         </li>
       ))}
     </ul>
+      {open && <Chat myPet={myPet} other={open} onBack={() => setOpen(null)} />}
     </section>
   )
 }
