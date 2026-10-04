@@ -70,7 +70,7 @@ export function BrandMark({ size = 28, tone = 'color' }: { size?: number | strin
 export function Wordmark({ tone = 'color' }: { tone?: 'color' | 'light' }) {
   return (
     <span className="wordmark">
-      match d<BrandMark size="1.05em" tone={tone} />g
+      match d<BrandMark size="1.25em" tone={tone} />g
     </span>
   )
 }

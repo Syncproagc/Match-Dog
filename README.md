@@ -1,32 +1,29 @@
-# React + TypeScript + Vite
+# Match Dog
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Aplicativo para tutores encontrarem companhia para o pet: passeios, brincadeiras e cruzas responsáveis. Deslize para curtir; quando a curtida é recíproca, dá match.
 
-Currently, two official plugins are available:
+React + TypeScript + Vite, com Supabase para autenticação e dados.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Rodando localmente
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Sem variáveis de ambiente o app abre em **modo demo**, com dados salvos no navegador. Na tela de login, use "Entrar como visitante".
+
+Para usar o Supabase de verdade, copie `.env.example` para `.env` e preencha `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`. O esquema do banco está em `supabase/migrations/0001_init.sql`.
+
+## Scripts
+
+| Comando | O que faz |
+|---|---|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Checagem de tipos e build de produção |
+| `npm run lint` | Oxlint |
+| `npm run preview` | Serve o build localmente |
+
+## Identidade visual
+
+O símbolo, o logotipo, as cores, as fontes e o tom de voz estão em [`docs/BRAND.md`](docs/BRAND.md). No código, use `BrandMark` e `Wordmark` de `src/components/BrandMark.tsx`. Arquivos prontos para uso ficam em `public/brand/`.

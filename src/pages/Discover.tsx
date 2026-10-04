@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { SwipeCard } from '../components/SwipeCard'
-import { PawIcon } from '../components/Icons'
+import { BrandMark } from '../components/BrandMark'
 import { getCandidates, swipe } from '../lib/api'
 import type { Pet } from '../lib/types'
 
@@ -40,15 +40,15 @@ export function Discover({ myPet }: { myPet: Pet }) {
         <SwipeCard key={queue[0].id} pet={queue[0]} next={queue[1]} onSwipe={onSwipe} />
       ) : (
         <div className="empty">
-          <PawIcon />
+          <BrandMark size={72} />
           <h2>Você viu todos por aqui</h2>
           <p className="muted">Novos pets aparecem quando outros donos se cadastram. Volte mais tarde.</p>
         </div>
       )}
       {match && (
         <div className="overlay" onClick={() => setMatch(null)}>
-          <p className="eyebrow">Curtida recíproca</p>
-          <h1>Deu match</h1>
+          <BrandMark size={84} tone="light" />
+          <h1>Deu match!</h1>
           <div className="match-photos">
             <img src={myPet.photo_url ?? ''} alt={myPet.name} className="tilt-l" />
             <img src={match.photo_url ?? ''} alt={match.name} className="tilt-r" />

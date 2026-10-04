@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { BrandMark } from '../components/BrandMark'
 import { getMatches } from '../lib/api'
 import type { Pet } from '../lib/types'
 
@@ -20,6 +21,7 @@ export function Matches({ myPet }: { myPet: Pet }) {
   if (!list.length)
     return (
       <div className="empty page">
+        <BrandMark size={72} />
         <h2>Nenhum match ainda</h2>
         <p className="muted">Quando alguém curtir seu pet de volta, ele aparece aqui.</p>
       </div>

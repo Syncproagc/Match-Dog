@@ -85,7 +85,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 .count { font-family: var(--font-body); font-size: 15px; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
 .brand { display: inline-flex; align-items: center; font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.03em; line-height: 1; color: var(--text); margin: 0; }
 .wordmark { display: inline-flex; align-items: center; white-space: nowrap; }
-.wordmark .brand-mark { margin-inline: 0.03em; transform: translateY(0.03em); }
+.wordmark .brand-mark { width: 1.25em; height: 1.25em; margin-inline: 0.02em; transform: translateY(0.1em); }
 
 .primary {
   border: 0;
