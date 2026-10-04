@@ -8,6 +8,7 @@ interface Props {
   value: Filters
   total: number
   hasOrigin: boolean
+  onSetLocation: () => void
   onChange: (f: Filters) => void
   onClose: () => void
 }
@@ -23,7 +24,7 @@ const GROUPS: { key: ListKey; label: string; options: Record<string, string> }[]
   { key: 'breed_type', label: 'Tipo de raça', options: breedTypeLabel },
 ]
 
-export function FilterSheet({ value, total, hasOrigin, onChange, onClose }: Props) {
+export function FilterSheet({ value, total, hasOrigin, onSetLocation, onChange, onClose }: Props) {
   const closeRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -72,7 +73,12 @@ export function FilterSheet({ value, total, hasOrigin, onChange, onClose }: Prop
               onChange={(e) => onChange({ ...value, radiusKm: Number(e.target.value) })}
             />
             <div className="range-scale" aria-hidden><span>0 km</span><span>75 km</span><span>150 km</span></div>
-            {!hasOrigin && <p className="muted filter-note">Defina a localização do seu pet em "Meu pet" para filtrar por distância.</p>}
+            {!hasOrigin && (
+              <div className="filter-note-box">
+                <p className="muted filter-note">A distância precisa da localização do seu pet.</p>
+                <button type="button" className="secondary small" onClick={onSetLocation}>Definir localização</button>
+              </div>
+            )}
           </fieldset>
           {GROUPS.map((g) => (
             <fieldset className="field" key={g.key}>

@@ -11,8 +11,8 @@
   --like: #3c9a6b;
   --nope: #c2493a;
   --shadow: 32 18 10;     /* sombra tingida de marrom */
-  --font-display: 'Bricolage Grotesque', 'Outfit', system-ui, sans-serif;
-  --font-body: 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --r-xl: 36px;
   --r-lg: 30px;
   --r-md: 20px;
@@ -94,7 +94,9 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 .page-title { font-size: 34px; font-weight: 800; display: flex; align-items: baseline; gap: 10px; }
 .lede { margin: -4px 0 4px; }
 .count { font-family: var(--font-body); font-size: 15px; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
-.brand { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-weight: 800; font-size: 20px; letter-spacing: -0.02em; color: var(--accent); margin: 0; }
+.brand { display: inline-flex; align-items: center; font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.03em; line-height: 1; color: var(--text); margin: 0; }
+.wordmark { display: inline-flex; align-items: center; white-space: nowrap; }
+.wordmark .brand-mark { width: 1.25em; height: 1.25em; margin-inline: 0.02em; transform: translateY(0.1em); }
 
 .primary {
   border: 0;
@@ -526,3 +528,5 @@ input.range:disabled { opacity: 0.4; cursor: not-allowed; }
 .gallery-arrow.prev { left: 10px; }
 .gallery-arrow.next { right: 10px; rotate: 180deg; }
 @media (hover: none) { .gallery-arrow { display: none; } }
+
+.filter-note-box { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }

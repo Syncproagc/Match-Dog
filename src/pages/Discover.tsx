@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react'
 import { SwipeCard } from '../components/SwipeCard'
+import { BrandMark } from '../components/BrandMark'
 import { FilterSheet } from '../components/FilterSheet'
 import { FilterIcon, PawIcon } from '../components/Icons'
-import { distanceKm, distanceLabel, petPoint } from '../lib/geo'
+import { cityPoint, distanceKm, distanceLabel, petPoint } from '../lib/geo'
 import { countFilters, loadFilters, matchesFilters, noFilters, saveFilters, type Filters } from '../lib/filters'
 import { getCandidates, swipe } from '../lib/api'
 import type { Pet } from '../lib/types'
 
 const CONFETTI = Array.from({ length: 28 }, (_, i) => ({ left: (i * 37) % 100, delay: (i % 7) * 0.12, dur: 2.4 + (i % 5) * 0.35, hue: i % 4, rot: (i * 53) % 360 }))
 
-export function Discover({ myPet }: { myPet: Pet }) {
+export function Discover({ myPet, onSetLocation }: { myPet: Pet; onSetLocation: () => void }) {
   const [queue, setQueue] = useState<Pet[] | null>(null)
   const [match, setMatch] = useState<Pet | null>(null)
   const [error, setError] = useState('')
@@ -24,7 +25,8 @@ export function Discover({ myPet }: { myPet: Pet }) {
     setFilters(f)
     saveFilters(f)
   }
-  const origin = petPoint(myPet)
+  // Pets salvos antes do filtro de distância não têm coordenadas: usa a cidade cadastrada
+  const origin = petPoint(myPet) ?? cityPoint(myPet.city)
   const visible = queue?.filter((p) => matchesFilters(p, filters, origin)) ?? []
   const distanceTo = (p: Pet) => {
     const pt = petPoint(p)
@@ -82,14 +84,14 @@ export function Discover({ myPet }: { myPet: Pet }) {
           )}
         </div>
       )}
-      {showFilters && <FilterSheet value={filters} total={visible.length} hasOrigin={origin != null} onChange={update} onClose={() => setShowFilters(false)} />}
+      {showFilters && <FilterSheet value={filters} total={visible.length} hasOrigin={origin != null} onSetLocation={() => { setShowFilters(false); onSetLocation() }} onChange={update} onClose={() => setShowFilters(false)} />}
       {match && (
         <div className="overlay" onClick={() => setMatch(null)}>
           {CONFETTI.map((c, i) => (
             <i key={i} className={`confetti c${c.hue}`} style={{ left: `${c.left}%`, animationDelay: `${c.delay}s`, animationDuration: `${c.dur}s`, rotate: `${c.rot}deg` }} />
           ))}
-          <p className="eyebrow">Curtida recíproca</p>
-          <h1>Deu match</h1>
+          <BrandMark size={84} tone="light" />
+          <h1>Deu match!</h1>
           <div className="match-photos">
             <img src={myPet.photo_url ?? ''} alt={myPet.name} className="tilt-l" />
             <img src={match.photo_url ?? ''} alt={match.name} className="tilt-r" />
