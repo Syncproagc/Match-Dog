@@ -21,12 +21,27 @@ export default function App() {
     return onAuthChange(setUser)
   }, [])
 
+  const [loadError, setLoadError] = useState(false)
+
   useEffect(() => {
-    if (user) getMyPet(user).then(setPet, () => setPet(null))
+    if (!user) return
+    let stale = false
+    getMyPet(user).then(
+      (p) => !stale && setPet(p),
+      () => !stale && setLoadError(true),
+    )
+    return () => { stale = true }
   }, [user])
 
   if (user === undefined) return <div className="boot"><PawIcon /></div>
   if (!user) return <Login onLogin={setUser} />
+  if (loadError)
+    return (
+      <div className="boot">
+        <p className="error" role="alert">Não foi possível carregar seu pet.</p>
+        <button type="button" className="secondary" onClick={() => user && (setLoadError(false), getMyPet(user).then(setPet, () => setLoadError(true)))}>Tentar de novo</button>
+      </div>
+    )
   if (pet === undefined) return <div className="boot"><PawIcon /></div>
 
   const logout = async () => {

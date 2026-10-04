@@ -39,11 +39,11 @@ export function Login({ onLogin }: { onLogin: (u: User) => void }) {
         <p className="muted">Encontre companhia para passeios, brincadeiras e cruzas responsáveis perto de você.</p>
       </div>
       {isDemo && <p className="notice">Modo demo: entre como visitante ou use qualquer e-mail e uma senha de 6 caracteres.</p>}
-      <form onSubmit={submit} className="form">
-        <input id="email" aria-label="E-mail" type="email" placeholder="E-mail" required value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input id="password" aria-label="Senha" type="password" placeholder="Senha" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
-        {error && <p className="error">{error}</p>}
-        <button type="button" className="primary" disabled={busy} onClick={() => submit()}>{signUp ? 'Criar conta' : 'Entrar'}</button>
+      <form onSubmit={(e) => e.preventDefault()} className="form">
+        <input id="email" aria-label="E-mail" type="email" name="email" autoComplete="email" placeholder="E-mail" required value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input id="password" aria-label="Senha" type="password" name="password" autoComplete={signUp ? 'new-password' : 'current-password'} placeholder="Senha" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+        {error && <p className="error" role="alert">{error}</p>}
+        <button type="submit" className="primary" disabled={busy} onClick={submit}>{signUp ? 'Criar conta' : 'Entrar'}</button>
       </form>
       {isDemo && (
         <button type="button" className="secondary" onClick={async () => onLogin(await enterDemo())}>

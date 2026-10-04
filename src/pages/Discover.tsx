@@ -17,6 +17,13 @@ export function Discover({ myPet }: { myPet: Pet }) {
   const [showFilters, setShowFilters] = useState(false)
 
   useEffect(() => {
+    if (!match) return
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMatch(null)
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [match])
+
+  useEffect(() => {
     getCandidates(myPet).then(setQueue, (e) => setError(e.message))
   }, [myPet])
 
@@ -39,11 +46,12 @@ export function Discover({ myPet }: { myPet: Pet }) {
     try {
       if (await swipe(myPet, current, liked)) setMatch(current)
     } catch (e) {
+      setQueue((q) => (q ? [current, ...q] : q))
       setError((e as Error).message)
     }
   }
 
-  if (error) return <p className="error page">{error}</p>
+  if (error && !queue) return <p className="error page" role="alert">{error}</p>
   if (!queue)
     return (
       <div className="discover">
@@ -61,6 +69,11 @@ export function Discover({ myPet }: { myPet: Pet }) {
           <FilterIcon /> Filtros{active > 0 && <span className="badge">{active}</span>}
         </button>
       </div>
+      {error && (
+        <p className="error" role="alert">
+          {error} <button type="button" className="link" onClick={() => setError('')}>Fechar</button>
+        </p>
+      )}
       {visible.length ? (
         <SwipeCard key={visible[0].id} pet={visible[0]} next={visible[1]} distance={distanceTo(visible[0])} onSwipe={onSwipe} />
       ) : (
@@ -84,7 +97,7 @@ export function Discover({ myPet }: { myPet: Pet }) {
       )}
       {showFilters && <FilterSheet value={filters} total={visible.length} hasOrigin={origin != null} onChange={update} onClose={() => setShowFilters(false)} />}
       {match && (
-        <div className="overlay" onClick={() => setMatch(null)}>
+        <div className="overlay" role="dialog" aria-modal="true" aria-label="Deu match" onClick={() => setMatch(null)}>
           {CONFETTI.map((c, i) => (
             <i key={i} className={`confetti c${c.hue}`} style={{ left: `${c.left}%`, animationDelay: `${c.delay}s`, animationDuration: `${c.dur}s`, rotate: `${c.rot}deg` }} />
           ))}
@@ -95,7 +108,7 @@ export function Discover({ myPet }: { myPet: Pet }) {
             <img src={match.photo_url ?? ''} alt={match.name} className="tilt-r" />
           </div>
           <p>{myPet.name} e {match.name} se curtiram. Que tal marcar um passeio?</p>
-          <button className="primary" onClick={() => setMatch(null)}>Continuar descobrindo</button>
+          <button className="primary" autoFocus onClick={() => setMatch(null)}>Continuar descobrindo</button>
         </div>
       )}
     </div>

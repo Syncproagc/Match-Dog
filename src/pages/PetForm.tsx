@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { savePet } from '../lib/api'
 import { CameraIcon, CloseIcon, PinIcon, PlusIcon } from '../components/Icons'
 import { CITIES, cityPoint, currentPosition } from '../lib/geo'
@@ -67,7 +67,11 @@ export function PetForm({ user, pet, onSaved }: Props) {
 
   const set = <K extends keyof PetInput>(k: K, v: PetInput[K]) => setForm((f) => ({ ...f, [k]: v }))
   const toggleTemper = (t: string) => set('temperament', form.temperament.includes(t) ? form.temperament.filter((x) => x !== t) : [...form.temperament, t])
-  const preview = photo ? URL.createObjectURL(photo) : form.photo_url
+  const photoUrl = useMemo(() => (photo ? URL.createObjectURL(photo) : null), [photo])
+  const extraUrls = useMemo(() => extra.map((f) => URL.createObjectURL(f)), [extra])
+  useEffect(() => () => { if (photoUrl) URL.revokeObjectURL(photoUrl) }, [photoUrl])
+  useEffect(() => () => extraUrls.forEach(URL.revokeObjectURL), [extraUrls])
+  const preview = photoUrl ?? form.photo_url
   const room = MAX_EXTRA - form.photos.length - extra.length
   const addExtra = (files: FileList | null) => files && setExtra((x) => [...x, ...Array.from(files)].slice(0, MAX_EXTRA - form.photos.length))
   const setCity = (city: string) => {
@@ -136,7 +140,7 @@ export function PetForm({ user, pet, onSaved }: Props) {
           ))}
           {extra.map((f, i) => (
             <div key={f.name + i} className="thumb">
-              <img src={URL.createObjectURL(f)} alt="Nova foto do pet" />
+              <img src={extraUrls[i]} alt="Nova foto do pet" />
               <button type="button" aria-label="Remover foto" onClick={() => setExtra((x) => x.filter((_, j) => j !== i))}><CloseIcon size={14} /></button>
             </div>
           ))}
@@ -238,7 +242,7 @@ export function PetForm({ user, pet, onSaved }: Props) {
         <textarea id="pet-bio" placeholder="Conte em poucas linhas como seu pet é" rows={3} maxLength={280} value={form.bio ?? ''} onChange={(e) => set('bio', e.target.value)} />
       </div>
       {error && <p className="error" role="alert">{error}</p>}
-      <button type="button" className="primary" disabled={busy} onClick={() => submit()}>{busy ? 'Salvando...' : 'Salvar'}</button>
+      <button type="submit" className="primary" disabled={busy}>{busy ? 'Salvando...' : 'Salvar'}</button>
     </form>
   )
 }

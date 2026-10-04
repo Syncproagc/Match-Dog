@@ -44,6 +44,18 @@ const stripSeed = (seed: (typeof seedPets)[number]): Pet => {
   return p as Pet
 }
 
+const MAX_PHOTO_BYTES = 8 * 1024 * 1024
+
+async function uploadPhoto(userId: string, file: File): Promise<string> {
+  if (!file.type.startsWith('image/')) throw new Error('Envie apenas imagens.')
+  if (file.size > MAX_PHOTO_BYTES) throw new Error('Cada foto pode ter no máximo 8 MB.')
+  const ext = (file.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5) || 'jpg'
+  const path = `${userId}/${crypto.randomUUID()}.${ext}`
+  const up = await supabase!.storage.from('pet-photos').upload(path, file, { contentType: file.type, cacheControl: '31536000' })
+  if (up.error) throw up.error
+  return supabase!.storage.from('pet-photos').getPublicUrl(path).data.publicUrl
+}
+
 // ---------- API ----------
 export async function getUser(): Promise<User | null> {
   if (!supabase) return load().user
@@ -108,20 +120,9 @@ export async function savePet(user: User, input: PetInput, photo: File | null, e
     save({ ...load(), myPet: pet })
     return pet
   }
-  let photo_url = input.photo_url
-  if (photo) {
-    const path = `${user.id}/${crypto.randomUUID()}-${photo.name}`
-    const up = await supabase.storage.from('pet-photos').upload(path, photo)
-    if (up.error) throw up.error
-    photo_url = supabase.storage.from('pet-photos').getPublicUrl(path).data.publicUrl
-  }
+  const photo_url = photo ? await uploadPhoto(user.id, photo) : input.photo_url
   const photos = [...input.photos]
-  for (const f of extra) {
-    const path = `${user.id}/${crypto.randomUUID()}-${f.name}`
-    const up = await supabase.storage.from('pet-photos').upload(path, f)
-    if (up.error) throw up.error
-    photos.push(supabase.storage.from('pet-photos').getPublicUrl(path).data.publicUrl)
-  }
+  for (const f of extra) photos.push(await uploadPhoto(user.id, f))
   const row = { ...input, photo_url, photos, owner_id: user.id }
   const q = existing
     ? supabase.from('pets').update(row).eq('id', existing.id)

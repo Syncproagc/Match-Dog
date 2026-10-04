@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Pet } from '../lib/types'
 import { CloseIcon, HeartIcon, InfoIcon, PinIcon } from './Icons'
 import { PetSheet } from './PetSheet'
@@ -19,13 +19,25 @@ export function SwipeCard({ pet, next, distance, onSwipe }: Props) {
   const [dragging, setDragging] = useState(false)
   const [open, setOpen] = useState(false)
   const start = useRef<number | null>(null)
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
+  useEffect(() => () => clearTimeout(timer.current), [])
   const finish = (liked: boolean) => {
     if (leaving !== null) return
     setLeaving(liked)
     navigator.vibrate?.(liked ? [12, 40, 12] : 8)
-    setTimeout(() => onSwipe(liked), 280)
+    timer.current = setTimeout(() => onSwipe(liked), 280)
   }
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (open || e.defaultPrevented || (e.target as HTMLElement).closest('input, textarea, select, [role=dialog]')) return
+      if (e.key === 'ArrowRight') finish(true)
+      else if (e.key === 'ArrowLeft') finish(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  })
 
   const onPointerDown = (e: React.PointerEvent) => {
     start.current = e.clientX
