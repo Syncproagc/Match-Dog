@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { enterDemo, isDemo, signIn } from '../lib/api'
-import { HeartIcon, PawIcon } from '../components/Icons'
+import { HeartIcon } from '../components/Icons'
+import { Wordmark } from '../components/BrandMark'
 import type { User } from '../lib/types'
 
 export function Login({ onLogin }: { onLogin: (u: User) => void }) {
@@ -34,7 +35,7 @@ export function Login({ onLogin }: { onLogin: (u: User) => void }) {
         <span className="mini-card c3"><HeartIcon size={34} /></span>
       </div>
       <div className="login-copy">
-        <p className="brand"><PawIcon /> Match Dog</p>
+        <p className="brand"><Wordmark /></p>
         <h1>Amizades de quatro patas começam com um deslize.</h1>
         <p className="muted">Encontre companhia para passeios, brincadeiras e cruzas responsáveis perto de você.</p>
       </div>
