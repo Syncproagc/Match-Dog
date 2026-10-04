@@ -212,7 +212,7 @@ nav button {
   font-weight: 500;
   transition: background 0.25s, color 0.25s;
 }
-nav button span { display: none; }
+nav button span { display: none; white-space: nowrap; }
 nav button:hover { color: var(--text); }
 nav button.active { background: var(--accent); color: var(--accent-ink); box-shadow: 0 8px 18px -8px rgb(217 88 63 / 0.7); animation: grow 0.4s var(--ease); }
 nav button.active span { display: inline; }
@@ -381,3 +381,10 @@ nav button:active { transform: scale(0.94); }
 .empty-art span:nth-child(2) { right: 0; top: 6px; rotate: 10deg; background: linear-gradient(160deg, #9cc7b4, #3f8f7a); opacity: 0.6; }
 .empty-art span:nth-child(3) { left: 28px; top: 0; display: grid; place-items: center; background: var(--glass); backdrop-filter: blur(10px); box-shadow: inset 0 0 0 1px var(--glass-line), 0 16px 28px -14px rgb(var(--shadow) / 0.5); animation: float 6s ease-in-out infinite; }
 .empty-art svg { width: 34px; height: 34px; }
+
+/* Perfil */
+.profile { display: flex; flex-direction: column; gap: 16px; }
+.profile .eyebrow { text-transform: none; letter-spacing: 0; font-size: 14px; font-weight: 500; }
+.profile-card { position: relative; aspect-ratio: 3 / 4; border-radius: var(--r-lg); overflow: hidden; background: var(--sunken); box-shadow: 0 40px 60px -30px rgb(var(--shadow) / 0.6); }
+.profile-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.profile .secondary { align-self: center; padding-inline: 32px; }
