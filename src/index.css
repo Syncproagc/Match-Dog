@@ -213,10 +213,10 @@ nav button {
   font-weight: 500;
   transition: background 0.25s, color 0.25s;
 }
-nav button span { display: none; white-space: nowrap; }
+nav button span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 nav button:hover { color: var(--text); }
 nav button.active { background: var(--accent); color: var(--accent-ink); box-shadow: 0 8px 18px -8px rgb(217 88 63 / 0.7); animation: grow 0.4s var(--ease); }
-nav button.active span { display: inline; }
+nav button.active span { position: static; width: auto; height: auto; overflow: visible; clip-path: none; }
 @keyframes grow { from { padding-inline: 10px; } }
 nav button:active { transform: scale(0.94); }
 

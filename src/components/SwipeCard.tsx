@@ -61,7 +61,7 @@ export function SwipeCard({ pet, next, distance, onSwipe }: Props) {
 
   const x = leaving === null ? dx : leaving ? 640 : -640
   const progress = Math.min(1, Math.abs(x) / THRESHOLD)
-  const tags = cardFacts(pet)
+  const tags = cardFacts(pet).slice(0, 3)
 
   return (
     <div className="deck-wrap">

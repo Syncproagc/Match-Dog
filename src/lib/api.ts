@@ -38,6 +38,15 @@ const fileToDataUrl = (f: File) =>
     r.readAsDataURL(f)
   })
 
+const shuffle = <T,>(a: T[]): T[] => {
+  const r = [...a]
+  for (let i = r.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[r[i], r[j]] = [r[j], r[i]]
+  }
+  return r
+}
+
 const stripSeed = (seed: (typeof seedPets)[number]): Pet => {
   const p: Partial<typeof seed> = { ...seed }
   delete p.likesBack
@@ -149,9 +158,10 @@ export async function getCandidates(myPet: Pet): Promise<Pet[]> {
     .select('*')
     .neq('owner_id', myPet.owner_id)
     .not('id', 'in', `(${exclude.join(',')})`)
+    .order('created_at', { ascending: false })
     .limit(50)
   if (error) throw error
-  return data
+  return shuffle(data)
 }
 
 /** Registra like/dislike. Retorna true se deu match. */
