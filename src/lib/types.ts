@@ -1,5 +1,8 @@
 export type Species = 'dog' | 'cat' | 'other'
 export type Sex = 'male' | 'female'
+export type Purpose = 'work' | 'home'
+export type Sociability = 'sociable' | 'people_only' | 'animals_only' | 'antisocial'
+export type BreedType = 'purebred' | 'mixed' | 'caramelo'
 
 export interface Pet {
   id: string
@@ -11,7 +14,18 @@ export interface Pet {
   sex: Sex | null
   city: string | null
   bio: string | null
+  temperament: string[]
+  purpose: Purpose | null
+  sociability: Sociability | null
+  breed_type: BreedType | null
+  sire_breed: string | null
+  dam_breed: string | null
+  has_pedigree: boolean | null
+  registry: string | null
+  times_bred: number | null
+  has_offspring: boolean | null
   photo_url: string | null
+  photos: string[]
 }
 
 export type PetInput = Omit<Pet, 'id' | 'owner_id'>
