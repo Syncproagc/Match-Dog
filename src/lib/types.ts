@@ -36,3 +36,11 @@ export interface User {
   id: string
   email: string
 }
+
+export interface Message {
+  id: string
+  from_pet_id: string
+  to_pet_id: string
+  body: string
+  created_at: string
+}
