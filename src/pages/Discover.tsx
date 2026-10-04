@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { SwipeCard } from '../components/SwipeCard'
+import { PawIcon } from '../components/Icons'
 import { getCandidates, swipe } from '../lib/api'
 import type { Pet } from '../lib/types'
 
@@ -24,24 +25,36 @@ export function Discover({ myPet }: { myPet: Pet }) {
   }
 
   if (error) return <p className="error page">{error}</p>
-  if (!queue) return <p className="muted page">Carregando...</p>
+  if (!queue)
+    return (
+      <div className="discover">
+        <div className="deck-wrap">
+          <div className="deck"><div className="card skeleton" /></div>
+        </div>
+      </div>
+    )
 
   return (
     <div className="discover">
       {queue.length ? (
-        <SwipeCard key={queue[0].id} pet={queue[0]} onSwipe={onSwipe} />
+        <SwipeCard key={queue[0].id} pet={queue[0]} next={queue[1]} onSwipe={onSwipe} />
       ) : (
-        <p className="muted empty">Não há mais pets por perto. Volte mais tarde! 🐾</p>
+        <div className="empty">
+          <PawIcon />
+          <h2>Você viu todos por aqui</h2>
+          <p className="muted">Novos pets aparecem quando outros donos se cadastram. Volte mais tarde.</p>
+        </div>
       )}
       {match && (
         <div className="overlay" onClick={() => setMatch(null)}>
-          <h1>Deu Match! 🎉</h1>
+          <p className="eyebrow">Curtida recíproca</p>
+          <h1>Deu match</h1>
           <div className="match-photos">
-            <img src={myPet.photo_url ?? ''} alt={myPet.name} />
-            <img src={match.photo_url ?? ''} alt={match.name} />
+            <img src={myPet.photo_url ?? ''} alt={myPet.name} className="tilt-l" />
+            <img src={match.photo_url ?? ''} alt={match.name} className="tilt-r" />
           </div>
-          <p>{myPet.name} e {match.name} se curtiram!</p>
-          <button className="primary">Continuar</button>
+          <p>{myPet.name} e {match.name} se curtiram. Que tal marcar um passeio?</p>
+          <button className="primary">Continuar descobrindo</button>
         </div>
       )}
     </div>

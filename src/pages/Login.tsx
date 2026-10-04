@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { isDemo, signIn } from '../lib/api'
+import { HeartIcon, PawIcon } from '../components/Icons'
 import type { User } from '../lib/types'
 
 export function Login({ onLogin }: { onLogin: (u: User) => void }) {
@@ -24,17 +25,25 @@ export function Login({ onLogin }: { onLogin: (u: User) => void }) {
 
   return (
     <div className="login">
-      <h1 className="logo">🐾 Match Dog</h1>
-      <p className="muted">Encontre o par perfeito para o seu pet</p>
-      {isDemo && <p className="notice">Modo demo: qualquer e-mail e senha funcionam.</p>}
+      <div className="login-art" aria-hidden>
+        <span className="mini-card c1" />
+        <span className="mini-card c2" />
+        <span className="mini-card c3"><HeartIcon size={34} /></span>
+      </div>
+      <div className="login-copy">
+        <p className="brand"><PawIcon /> Match Dog</p>
+        <h1>Amizades de quatro patas começam com um deslize.</h1>
+        <p className="muted">Encontre companhia para passeios, brincadeiras e cruzas responsáveis perto de você.</p>
+      </div>
+      {isDemo && <p className="notice">Modo demo: use qualquer e-mail e uma senha de 6 caracteres.</p>}
       <form onSubmit={submit} className="form">
-        <input type="email" placeholder="E-mail" required value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input type="password" placeholder="Senha" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+        <input id="email" aria-label="E-mail" type="email" placeholder="E-mail" required value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input id="password" aria-label="Senha" type="password" placeholder="Senha" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
         {error && <p className="error">{error}</p>}
         <button className="primary" disabled={busy}>{signUp ? 'Criar conta' : 'Entrar'}</button>
       </form>
       <button className="link" onClick={() => setSignUp(!signUp)}>
-        {signUp ? 'Já tenho conta' : 'Criar uma conta'}
+        {signUp ? 'Já tenho conta. Entrar' : 'Ainda não tem conta? Criar agora'}
       </button>
     </div>
   )

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { savePet } from '../lib/api'
+import { CameraIcon } from '../components/Icons'
 import type { Pet, PetInput, User } from '../lib/types'
 
 interface Props {
@@ -41,36 +42,37 @@ export function PetForm({ user, pet, onSaved }: Props) {
 
   return (
     <form onSubmit={submit} className="form page">
-      <h2>{pet ? 'Perfil do seu pet' : 'Cadastre seu pet'}</h2>
+      <h1 className="page-title">{pet ? 'Perfil do seu pet' : 'Cadastre seu pet'}</h1>
+      {!pet && <p className="muted lede">É assim que outros donos vão ver seu pet. Dá para mudar depois.</p>}
       <label className="photo-pick">
-        {preview ? <img src={preview} alt="" /> : <span>📷 Adicionar foto</span>}
+        {preview ? <img src={preview} alt="Foto do seu pet" /> : <span className="pick-empty"><CameraIcon />Adicionar foto</span>}
         <input type="file" accept="image/*" hidden onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} />
       </label>
-      <input placeholder="Nome" required value={form.name} onChange={(e) => set('name', e.target.value)} />
+      <input id="pet-name" aria-label="Nome" placeholder="Nome" required value={form.name} onChange={(e) => set('name', e.target.value)} />
       <div className="row">
-        <select value={form.species} onChange={(e) => set('species', e.target.value as PetInput['species'])}>
+        <select id="pet-species" aria-label="Espécie" value={form.species} onChange={(e) => set('species', e.target.value as PetInput['species'])}>
           <option value="dog">Cachorro</option>
           <option value="cat">Gato</option>
           <option value="other">Outro</option>
         </select>
-        <select value={form.sex ?? ''} onChange={(e) => set('sex', (e.target.value || null) as PetInput['sex'])}>
+        <select id="pet-sex" aria-label="Sexo" value={form.sex ?? ''} onChange={(e) => set('sex', (e.target.value || null) as PetInput['sex'])}>
           <option value="">Sexo</option>
           <option value="male">Macho</option>
           <option value="female">Fêmea</option>
         </select>
       </div>
       <div className="row">
-        <input placeholder="Raça" value={form.breed ?? ''} onChange={(e) => set('breed', e.target.value)} />
+        <input id="pet-breed" aria-label="Raça" placeholder="Raça" value={form.breed ?? ''} onChange={(e) => set('breed', e.target.value)} />
         <input
           type="number"
           min={0}
-          placeholder="Idade"
+          id="pet-age" aria-label="Idade" placeholder="Idade"
           value={form.age_years ?? ''}
           onChange={(e) => set('age_years', e.target.value === '' ? null : Number(e.target.value))}
         />
       </div>
-      <input placeholder="Cidade" value={form.city ?? ''} onChange={(e) => set('city', e.target.value)} />
-      <textarea placeholder="Conte um pouco sobre seu pet" rows={3} value={form.bio ?? ''} onChange={(e) => set('bio', e.target.value)} />
+      <input id="pet-city" aria-label="Cidade" placeholder="Cidade" value={form.city ?? ''} onChange={(e) => set('city', e.target.value)} />
+      <textarea id="pet-bio" aria-label="Sobre" placeholder="Conte um pouco sobre seu pet" rows={3} value={form.bio ?? ''} onChange={(e) => set('bio', e.target.value)} />
       {error && <p className="error">{error}</p>}
       <button className="primary" disabled={busy}>{busy ? 'Salvando...' : 'Salvar'}</button>
     </form>

@@ -5,6 +5,7 @@ import { Login } from './pages/Login'
 import { PetForm } from './pages/PetForm'
 import { Discover } from './pages/Discover'
 import { Matches } from './pages/Matches'
+import { ChatIcon, PawIcon, StackIcon } from './components/Icons'
 
 type Tab = 'discover' | 'matches' | 'profile'
 
@@ -22,9 +23,9 @@ export default function App() {
     if (user) getMyPet(user).then(setPet, () => setPet(null))
   }, [user])
 
-  if (user === undefined) return <p className="muted page">Carregando...</p>
+  if (user === undefined) return <div className="boot"><PawIcon /></div>
   if (!user) return <Login onLogin={setUser} />
-  if (pet === undefined) return <p className="muted page">Carregando...</p>
+  if (pet === undefined) return <div className="boot"><PawIcon /></div>
 
   const logout = async () => {
     await signOut()
@@ -36,7 +37,7 @@ export default function App() {
   return (
     <div className="app">
       <header>
-        <span className="logo">🐾 Match Dog</span>
+        <span className="brand"><PawIcon /> Match Dog</span>
         <button className="link" onClick={logout}>Sair</button>
       </header>
       <main>
@@ -51,10 +52,10 @@ export default function App() {
         )}
       </main>
       {pet && (
-        <nav>
-          <button className={tab === 'discover' ? 'active' : ''} onClick={() => setTab('discover')}>🔥<span>Descobrir</span></button>
-          <button className={tab === 'matches' ? 'active' : ''} onClick={() => setTab('matches')}>💬<span>Matches</span></button>
-          <button className={tab === 'profile' ? 'active' : ''} onClick={() => setTab('profile')}>🐶<span>Meu pet</span></button>
+        <nav aria-label="Principal">
+          <button className={tab === 'discover' ? 'active' : ''} aria-current={tab === 'discover' ? 'page' : undefined} onClick={() => setTab('discover')}><StackIcon /><span>Descobrir</span></button>
+          <button className={tab === 'matches' ? 'active' : ''} aria-current={tab === 'matches' ? 'page' : undefined} onClick={() => setTab('matches')}><ChatIcon /><span>Matches</span></button>
+          <button className={tab === 'profile' ? 'active' : ''} aria-current={tab === 'profile' ? 'page' : undefined} onClick={() => setTab('profile')}><PawIcon /><span>Meu pet</span></button>
         </nav>
       )}
     </div>

@@ -11,14 +11,27 @@ export function Matches({ myPet }: { myPet: Pet }) {
   }, [myPet])
 
   if (error) return <p className="error page">{error}</p>
-  if (!list) return <p className="muted page">Carregando...</p>
-  if (!list.length) return <p className="muted page">Nenhum match ainda. Continue curtindo! ❤️</p>
+  if (!list)
+    return (
+      <ul className="matches page">
+        {[0, 1, 2].map((i) => <li key={i} className="skeleton-row" />)}
+      </ul>
+    )
+  if (!list.length)
+    return (
+      <div className="empty page">
+        <h2>Nenhum match ainda</h2>
+        <p className="muted">Quando alguém curtir seu pet de volta, ele aparece aqui.</p>
+      </div>
+    )
 
   return (
-    <ul className="matches page">
+    <section className="page">
+      <h1 className="page-title">Matches <span className="count">{list.length}</span></h1>
+      <ul className="matches">
       {list.map((p) => (
         <li key={p.id}>
-          <img src={p.photo_url ?? ''} alt="" />
+          <img src={p.photo_url ?? ''} alt={`Foto de ${p.name}`} />
           <div>
             <strong>{p.name}</strong>
             <span className="muted">{[p.breed, p.city].filter(Boolean).join(' · ')}</span>
@@ -26,5 +39,6 @@ export function Matches({ myPet }: { myPet: Pet }) {
         </li>
       ))}
     </ul>
+    </section>
   )
 }
