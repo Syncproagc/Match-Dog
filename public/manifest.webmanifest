@@ -1,0 +1,11 @@
+{
+  "name": "Match Dog",
+  "short_name": "Match Dog",
+  "description": "Encontre o par perfeito para o seu pet.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6efe8",
+  "theme_color": "#e8735a",
+  "lang": "pt-BR",
+  "icons": [{ "src": "/brand/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

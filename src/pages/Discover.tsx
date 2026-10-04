@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { SwipeCard } from '../components/SwipeCard'
+import { BrandMark } from '../components/BrandMark'
 import { FilterSheet } from '../components/FilterSheet'
 import { FilterIcon, PawIcon } from '../components/Icons'
 import { distanceKm, distanceLabel, petPoint } from '../lib/geo'
@@ -88,8 +89,8 @@ export function Discover({ myPet }: { myPet: Pet }) {
           {CONFETTI.map((c, i) => (
             <i key={i} className={`confetti c${c.hue}`} style={{ left: `${c.left}%`, animationDelay: `${c.delay}s`, animationDuration: `${c.dur}s`, rotate: `${c.rot}deg` }} />
           ))}
-          <p className="eyebrow">Curtida recíproca</p>
-          <h1>Deu match</h1>
+          <BrandMark size={84} tone="light" />
+          <h1>Deu match!</h1>
           <div className="match-photos">
             <img src={myPet.photo_url ?? ''} alt={myPet.name} className="tilt-l" />
             <img src={match.photo_url ?? ''} alt={match.name} className="tilt-r" />

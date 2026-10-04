@@ -7,6 +7,7 @@ import { Discover } from './pages/Discover'
 import { Matches } from './pages/Matches'
 import { Profile } from './pages/Profile'
 import { ChatIcon, PawIcon, StackIcon } from './components/Icons'
+import { Wordmark } from './components/BrandMark'
 
 type Tab = 'discover' | 'matches' | 'profile'
 
@@ -39,7 +40,7 @@ export default function App() {
   return (
     <div className="app">
       <header>
-        <span className="brand"><PawIcon /> Match Dog</span>
+        <span className="brand"><Wordmark /></span>
         <div className="head-right">
           {pet?.photo_url && <img className="avatar" src={pet.photo_url} alt={pet.name} />}
           <button className="link" onClick={logout}>Sair</button>

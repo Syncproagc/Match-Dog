@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 0 112 100" fill="none"><defs>
+<radialGradient id="mb" cx=".32" cy=".26" r=".95"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#fff0e7"/><stop offset="1" stop-color="#efc3b1"/></radialGradient>
+<radialGradient id="mh" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#fff3ec"/><stop offset="1" stop-color="#f2cbb9"/></radialGradient>
+<linearGradient id="me" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f9d3c6"/><stop offset="1" stop-color="#e29b84"/></linearGradient>
+<radialGradient id="mm" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ffe3d5"/></radialGradient>
+<filter id="ms" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="1" stdDeviation="1.1" flood-color="#3b130a" flood-opacity=".22"/></filter>
+<g id="mhalf">
+<path d="M48.500 92C29 80 9 62 9 42C9 26 21 18 32 22C41 25 46 31 48.500 38Z" fill="url(#mb)" filter="url(#ms)"/>
+<ellipse cx="41" cy="58" rx="6.5" ry="4.6" transform="rotate(-20 41 58)" fill="url(#mm)" filter="url(#ms)"/>
+<circle cx="28" cy="37" r="15" fill="url(#mh)" filter="url(#ms)"/>
+<path d="M18 27C8 29 7 46 13 50C19 53 23 46 22 38Z" fill="url(#me)" filter="url(#ms)"/>
+<ellipse cx="40.5" cy="42" rx="7.2" ry="5.6" fill="url(#mm)"/>
+<g transform="translate(46 40.5)"><ellipse rx="3.1" ry="2.5" fill="#4a2418"/><ellipse cx="-.9" cy="-.9" rx="1.1" ry=".6" fill="#fff" opacity=".55"/></g>
+<g transform="translate(33.5 33)"><circle r="2.7" fill="#4a2418"/><circle cx="-.8" cy="-.9" r=".9" fill="#fff" opacity=".9"/></g>
+</g>
+</defs>
+<use href="#mhalf"/><use href="#mhalf" transform="translate(100 0) scale(-1 1)"/>
+<path d="M50 44V90" stroke="#3b130a" stroke-opacity=".3" stroke-width="1.6"/></svg>
