@@ -27,8 +27,9 @@ export function PetForm({ user, pet, onSaved }: Props) {
   const set = <K extends keyof PetInput>(k: K, v: PetInput[K]) => setForm((f) => ({ ...f, [k]: v }))
   const preview = photo ? URL.createObjectURL(photo) : form.photo_url
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const submit = async (e?: React.FormEvent) => {
+    e?.preventDefault()
+    if (!form.name.trim()) return setError('Dê um nome ao seu pet.')
     setBusy(true)
     setError('')
     try {
@@ -74,7 +75,7 @@ export function PetForm({ user, pet, onSaved }: Props) {
       <input id="pet-city" aria-label="Cidade" placeholder="Cidade" value={form.city ?? ''} onChange={(e) => set('city', e.target.value)} />
       <textarea id="pet-bio" aria-label="Sobre" placeholder="Conte um pouco sobre seu pet" rows={3} value={form.bio ?? ''} onChange={(e) => set('bio', e.target.value)} />
       {error && <p className="error">{error}</p>}
-      <button className="primary" disabled={busy}>{busy ? 'Salvando...' : 'Salvar'}</button>
+      <button type="button" className="primary" disabled={busy} onClick={() => submit()}>{busy ? 'Salvando...' : 'Salvar'}</button>
     </form>
   )
 }

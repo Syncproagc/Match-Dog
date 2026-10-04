@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import { seedPets } from './mockData'
+import { demoPet, seedPets } from './mockData'
 import type { Pet, PetInput, User } from './types'
 
 export const isDemo = !supabase
@@ -72,6 +72,14 @@ export async function signIn(email: string, password: string, signUp: boolean): 
   if (!data.user) throw new Error('Confirme seu e-mail para continuar.')
   if (signUp && !data.session) throw new Error('Enviamos um link de confirmação para seu e-mail.')
   return { id: data.user.id, email: data.user.email ?? email }
+}
+
+/** Modo demo: entra direto com um pet de exemplo já cadastrado */
+export async function enterDemo(): Promise<User> {
+  const user = { id: 'demo-user', email: 'visitante@matchdog.app' }
+  const s = load()
+  save({ ...s, user, myPet: s.myPet ?? { ...demoPet, owner_id: user.id } })
+  return user
 }
 
 export async function signOut() {
