@@ -46,7 +46,8 @@ export function PetForm({ user, pet, onSaved }: Props) {
     purpose: pet?.purpose ?? null,
     sociability: pet?.sociability ?? null,
     breed_type: pet?.breed_type ?? 'purebred',
-    breed2: pet?.breed2 ?? '',
+    sire_breed: pet?.sire_breed ?? '',
+    dam_breed: pet?.dam_breed ?? '',
     has_pedigree: pet?.has_pedigree ?? null,
     registry: pet?.registry ?? '',
     times_bred: pet?.times_bred ?? null,
@@ -60,19 +61,22 @@ export function PetForm({ user, pet, onSaved }: Props) {
   const toggleTemper = (t: string) => set('temperament', form.temperament.includes(t) ? form.temperament.filter((x) => x !== t) : [...form.temperament, t])
   const preview = photo ? URL.createObjectURL(photo) : form.photo_url
   const mixed = form.breed_type === 'mixed'
+  const purebred = form.breed_type === 'purebred'
   const female = form.sex === 'female'
 
   const submit = async (e?: React.FormEvent) => {
     e?.preventDefault()
     if (!form.name.trim()) return setError('Dê um nome ao seu pet.')
-    if (mixed && !form.breed?.trim()) return setError('Informe as duas raças da mistura.')
+    if (mixed && !form.sire_breed?.trim() && !form.dam_breed?.trim()) return setError('Informe a raça do pai, da mãe ou de ambos.')
     setBusy(true)
     setError('')
     try {
       // Campos que não se aplicam à resposta atual são limpos antes de salvar
       const clean: PetInput = {
         ...form,
-        breed2: mixed ? form.breed2 : null,
+        breed: purebred ? form.breed : null,
+        sire_breed: mixed ? form.sire_breed : null,
+        dam_breed: mixed ? form.dam_breed : null,
         registry: form.has_pedigree ? form.registry : null,
         times_bred: female ? form.times_bred : null,
         has_offspring: female ? form.has_offspring : null,
@@ -115,18 +119,25 @@ export function PetForm({ user, pet, onSaved }: Props) {
 
       <h2 className="form-section">Raça e registro</h2>
       <Choice label="Tipo de raça" value={form.breed_type} options={BREED_TYPE} onChange={(v) => set('breed_type', v ?? 'purebred')} />
-      <div className="row">
-        <div className="field grow">
-          <label htmlFor="pet-breed">{mixed ? 'Primeira raça' : 'Raça'}</label>
+      {purebred && (
+        <div className="field">
+          <label htmlFor="pet-breed">Raça</label>
           <input id="pet-breed" placeholder="Ex.: Beagle" value={form.breed ?? ''} onChange={(e) => set('breed', e.target.value)} />
         </div>
-        {mixed && (
+      )}
+      {mixed && (
+        <div className="row">
           <div className="field grow">
-            <label htmlFor="pet-breed2">Segunda raça</label>
-            <input id="pet-breed2" placeholder="Ex.: Labrador" value={form.breed2 ?? ''} onChange={(e) => set('breed2', e.target.value)} />
+            <label htmlFor="pet-sire">Raça do pai</label>
+            <input id="pet-sire" placeholder="Ex.: Labrador" value={form.sire_breed ?? ''} onChange={(e) => set('sire_breed', e.target.value)} />
           </div>
-        )}
-      </div>
+          <div className="field grow">
+            <label htmlFor="pet-dam">Raça da mãe</label>
+            <input id="pet-dam" placeholder="Ex.: Poodle" value={form.dam_breed ?? ''} onChange={(e) => set('dam_breed', e.target.value)} />
+          </div>
+        </div>
+      )}
+      {form.breed_type === 'caramelo' && <p className="notice">Mistura de várias raças ou sem raça definida fica como caramelo (SRD).</p>}
       <Choice label="Tem pedigree ou registro?" value={form.has_pedigree} options={YES_NO} onChange={(v) => set('has_pedigree', v)} />
       {form.has_pedigree && (
         <div className="field">

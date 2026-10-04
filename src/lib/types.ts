@@ -2,7 +2,7 @@ export type Species = 'dog' | 'cat' | 'other'
 export type Sex = 'male' | 'female'
 export type Purpose = 'work' | 'home'
 export type Sociability = 'sociable' | 'people_only' | 'animals_only' | 'antisocial'
-export type BreedType = 'purebred' | 'mixed'
+export type BreedType = 'purebred' | 'mixed' | 'caramelo'
 
 export interface Pet {
   id: string
@@ -18,7 +18,8 @@ export interface Pet {
   purpose: Purpose | null
   sociability: Sociability | null
   breed_type: BreedType | null
-  breed2: string | null
+  sire_breed: string | null
+  dam_breed: string | null
   has_pedigree: boolean | null
   registry: string | null
   times_bred: number | null

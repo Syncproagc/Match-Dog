@@ -9,13 +9,17 @@ export const sociabilityLabel: Record<Sociability, string> = {
   animals_only: 'Só gosta de outros bichos',
   antisocial: 'Meio antissocial',
 }
-export const breedTypeLabel: Record<BreedType, string> = { purebred: 'Raça pura', mixed: 'Mistura de duas raças' }
+export const breedTypeLabel: Record<BreedType, string> = { purebred: 'Raça pura', mixed: 'Mistura (pai e mãe de raças diferentes)', caramelo: 'Caramelo (várias raças)' }
 export const TEMPERAMENTS = ['Calmo', 'Brincalhão', 'Energético', 'Dócil', 'Carinhoso', 'Protetor', 'Tímido', 'Independente', 'Obediente']
 
 export const ageLabel = (n: number) => `${n} ${n === 1 ? 'ano' : 'anos'}`
 
 export function breedLabel(p: Pet) {
-  if (p.breed_type === 'mixed') return [p.breed, p.breed2].filter(Boolean).join(' + ') || 'Sem raça definida'
+  if (p.breed_type === 'caramelo') return 'Caramelo (SRD)'
+  if (p.breed_type === 'mixed') {
+    const parts = [p.sire_breed && `Pai ${p.sire_breed}`, p.dam_breed && `mãe ${p.dam_breed}`].filter(Boolean)
+    return parts.length ? parts.join(' · ') : 'Mistura de raças'
+  }
   return p.breed || null
 }
 
