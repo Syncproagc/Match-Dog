@@ -19,15 +19,16 @@ const photo = (id: string) => {
 
 // likesBack: se o pet de demonstração devolve o like (simula o outro dono)
 export const seedPets: (Pet & { likesBack: boolean })[] = [
-  { id: 'p1', owner_id: 'u1', name: 'Thor', species: 'dog', breed: 'Golden Retriever', age_years: 3, sex: 'male', city: 'São Paulo', bio: 'Amo bolinhas e piscina.', photo_url: photo('p1'), likesBack: true },
-  { id: 'p2', owner_id: 'u2', name: 'Luna', species: 'dog', breed: 'Husky Siberiano', age_years: 2, sex: 'female', city: 'Curitiba', bio: 'Uivo quando estou feliz. Sempre.', photo_url: photo('p2'), likesBack: true },
-  { id: 'p3', owner_id: 'u3', name: 'Mel', species: 'cat', breed: 'SRD', age_years: 4, sex: 'female', city: 'Rio de Janeiro', bio: 'Sonecas ao sol são minha religião.', photo_url: photo('p3'), likesBack: false },
-  { id: 'p4', owner_id: 'u4', name: 'Bob', species: 'dog', breed: 'Beagle', age_years: 5, sex: 'male', city: 'Belo Horizonte', bio: 'Meu nariz me leva a aventuras.', photo_url: photo('p4'), likesBack: true },
-  { id: 'p5', owner_id: 'u5', name: 'Nina', species: 'dog', breed: 'Pug', age_years: 1, sex: 'female', city: 'Porto Alegre', bio: 'Pequena, barulhenta e muito fofa.', photo_url: photo('p5'), likesBack: false },
-  { id: 'p6', owner_id: 'u6', name: 'Simba', species: 'cat', breed: 'Maine Coon', age_years: 3, sex: 'male', city: 'Florianópolis', bio: 'Rei da casa, aceito carinho às vezes.', photo_url: photo('p6'), likesBack: true },
+  { id: 'p1', owner_id: 'u1', name: 'Thor', species: 'dog', breed: 'Golden Retriever', age_years: 3, sex: 'male', city: 'São Paulo', bio: 'Amo bolinhas e piscina.', photo_url: photo('p1'), temperament: ['Brincalhão', 'Carinhoso'], purpose: 'home', sociability: 'sociable', breed_type: 'purebred', breed2: null, has_pedigree: true, registry: 'CBKC', times_bred: null, has_offspring: null, likesBack: true },
+  { id: 'p2', owner_id: 'u2', name: 'Luna', species: 'dog', breed: 'Husky Siberiano', age_years: 2, sex: 'female', city: 'Curitiba', bio: 'Uivo quando estou feliz. Sempre.', photo_url: photo('p2'), temperament: ['Energético', 'Independente'], purpose: 'work', sociability: 'animals_only', breed_type: 'purebred', breed2: null, has_pedigree: true, registry: 'CBKC', times_bred: 2, has_offspring: true, likesBack: true },
+  { id: 'p3', owner_id: 'u3', name: 'Mel', species: 'cat', breed: 'SRD', age_years: 4, sex: 'female', city: 'Rio de Janeiro', bio: 'Sonecas ao sol são minha religião.', photo_url: photo('p3'), temperament: ['Calmo', 'Independente'], purpose: 'home', sociability: 'people_only', breed_type: 'mixed', breed2: 'Siamês', has_pedigree: false, registry: null, times_bred: 0, has_offspring: false, likesBack: false },
+  { id: 'p4', owner_id: 'u4', name: 'Bob', species: 'dog', breed: 'Beagle', age_years: 5, sex: 'male', city: 'Belo Horizonte', bio: 'Meu nariz me leva a aventuras.', photo_url: photo('p4'), temperament: ['Obediente', 'Energético'], purpose: 'work', sociability: 'sociable', breed_type: 'purebred', breed2: null, has_pedigree: false, registry: null, times_bred: null, has_offspring: null, likesBack: true },
+  { id: 'p5', owner_id: 'u5', name: 'Nina', species: 'dog', breed: 'Pug', age_years: 1, sex: 'female', city: 'Porto Alegre', bio: 'Pequena, barulhenta e muito fofa.', photo_url: photo('p5'), temperament: ['Dócil', 'Tímido'], purpose: 'home', sociability: 'antisocial', breed_type: 'purebred', breed2: null, has_pedigree: true, registry: null, times_bred: 1, has_offspring: true, likesBack: false },
+  { id: 'p6', owner_id: 'u6', name: 'Simba', species: 'cat', breed: 'Maine Coon', age_years: 3, sex: 'male', city: 'Florianópolis', bio: 'Rei da casa, aceito carinho às vezes.', photo_url: photo('p6'), temperament: ['Calmo', 'Protetor'], purpose: 'home', sociability: 'sociable', breed_type: 'purebred', breed2: null, has_pedigree: true, registry: 'LOGB', times_bred: null, has_offspring: null, likesBack: true },
 ]
 
 export const demoPet: Pet = {
-  id: 'my-pet', owner_id: 'demo-user', name: 'Paçoca', species: 'dog', breed: 'Vira-lata caramelo', age_years: 2, sex: 'male',
+  id: 'my-pet', owner_id: 'demo-user', name: 'Paçoca', species: 'dog', breed: 'Vira-lata', age_years: 2, sex: 'male',
   city: 'São Paulo', bio: 'Especialista em pedir petisco com olhar pidão.', photo_url: photo('me'),
+  temperament: ['Brincalhão', 'Carinhoso'], purpose: 'home', sociability: 'sociable', breed_type: 'mixed', breed2: 'Labrador', has_pedigree: false, registry: null, times_bred: null, has_offspring: null,
 }

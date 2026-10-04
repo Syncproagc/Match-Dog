@@ -1,10 +1,9 @@
 import { useRef, useState } from 'react'
 import type { Pet } from '../lib/types'
 import { CloseIcon, HeartIcon, PinIcon } from './Icons'
+import { cardFacts, speciesLabel } from '../lib/labels'
 
 const THRESHOLD = 110
-const speciesLabel = { dog: 'Cachorro', cat: 'Gato', other: 'Pet' }
-const sexLabel = { male: 'Macho', female: 'Fêmea' }
 
 interface Props {
   pet: Pet
@@ -42,7 +41,7 @@ export function SwipeCard({ pet, next, onSwipe }: Props) {
 
   const x = leaving === null ? dx : leaving ? 640 : -640
   const progress = Math.min(1, Math.abs(x) / THRESHOLD)
-  const tags = [pet.breed, pet.sex && sexLabel[pet.sex]].filter(Boolean)
+  const tags = cardFacts(pet)
 
   return (
     <div className="deck-wrap">
@@ -71,12 +70,12 @@ export function SwipeCard({ pet, next, onSwipe }: Props) {
           <span className="stamp like" style={{ opacity: Math.max(0, x / THRESHOLD) }}>Au</span>
           <span className="stamp nope" style={{ opacity: Math.max(0, -x / THRESHOLD) }}>Passo</span>
           <div className="card-info">
-            <p className="eyebrow">{speciesLabel[pet.species]}</p>
+            <p className="eyebrow">{[speciesLabel[pet.species], ...(pet.temperament ?? [])].join(' · ')}</p>
             <h2>{pet.name}{pet.age_years != null && <small>{pet.age_years}</small>}</h2>
             {tags.length > 0 && (
               <ul className="tags">
                 {tags.map((t) => (
-                  <li key={String(t)}>{t}</li>
+                  <li key={t}>{t}</li>
                 ))}
               </ul>
             )}
