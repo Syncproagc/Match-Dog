@@ -38,7 +38,10 @@ export default function App() {
     <div className="app">
       <header>
         <span className="brand"><PawIcon /> Match Dog</span>
-        <button className="link" onClick={logout}>Sair</button>
+        <div className="head-right">
+          {pet?.photo_url && <img className="avatar" src={pet.photo_url} alt={pet.name} />}
+          <button className="link" onClick={logout}>Sair</button>
+        </div>
       </header>
       <main>
         {!pet ? (
