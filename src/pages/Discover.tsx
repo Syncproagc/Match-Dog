@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { SwipeCard } from '../components/SwipeCard'
-import { PawIcon } from '../components/Icons'
+import { FilterSheet } from '../components/FilterSheet'
+import { FilterIcon, PawIcon } from '../components/Icons'
+import { distanceKm, distanceLabel, petPoint } from '../lib/geo'
+import { countFilters, loadFilters, matchesFilters, noFilters, saveFilters, type Filters } from '../lib/filters'
 import { getCandidates, swipe } from '../lib/api'
 import type { Pet } from '../lib/types'
 
@@ -10,15 +13,29 @@ export function Discover({ myPet }: { myPet: Pet }) {
   const [queue, setQueue] = useState<Pet[] | null>(null)
   const [match, setMatch] = useState<Pet | null>(null)
   const [error, setError] = useState('')
+  const [filters, setFilters] = useState<Filters>(loadFilters)
+  const [showFilters, setShowFilters] = useState(false)
 
   useEffect(() => {
     getCandidates(myPet).then(setQueue, (e) => setError(e.message))
   }, [myPet])
 
+  const update = (f: Filters) => {
+    setFilters(f)
+    saveFilters(f)
+  }
+  const origin = petPoint(myPet)
+  const visible = queue?.filter((p) => matchesFilters(p, filters, origin)) ?? []
+  const distanceTo = (p: Pet) => {
+    const pt = petPoint(p)
+    return origin && pt ? distanceLabel(distanceKm(origin, pt)) : null
+  }
+  const active = countFilters(filters)
+
   const onSwipe = async (liked: boolean) => {
-    if (!queue?.length) return
-    const [current, ...rest] = queue
-    setQueue(rest)
+    const current = visible[0]
+    if (!current) return
+    setQueue((q) => q?.filter((p) => p.id !== current.id) ?? null)
     try {
       if (await swipe(myPet, current, liked)) setMatch(current)
     } catch (e) {
@@ -38,17 +55,34 @@ export function Discover({ myPet }: { myPet: Pet }) {
 
   return (
     <div className="discover">
-      {queue.length ? (
-        <SwipeCard key={queue[0].id} pet={queue[0]} next={queue[1]} onSwipe={onSwipe} />
+      <div className="discover-bar">
+        <p className="muted">{visible.length} {visible.length === 1 ? 'pet para descobrir' : 'pets para descobrir'}</p>
+        <button type="button" className={active ? 'filter-btn on' : 'filter-btn'} onClick={() => setShowFilters(true)}>
+          <FilterIcon /> Filtros{active > 0 && <span className="badge">{active}</span>}
+        </button>
+      </div>
+      {visible.length ? (
+        <SwipeCard key={visible[0].id} pet={visible[0]} next={visible[1]} distance={distanceTo(visible[0])} onSwipe={onSwipe} />
       ) : (
         <div className="empty">
           <div className="empty-art" aria-hidden>
             <span /><span /><span><PawIcon /></span>
           </div>
-          <h2>Você viu todos por aqui</h2>
-          <p className="muted">Novos pets aparecem quando outros donos se cadastram. Volte mais tarde.</p>
+          {queue.length ? (
+            <>
+              <h2>Ninguém com esses filtros</h2>
+              <p className="muted">{queue.length} {queue.length === 1 ? 'pet está' : 'pets estão'} escondido{queue.length === 1 ? '' : 's'} pelos filtros. Afrouxe algum para ver mais.</p>
+              <button type="button" className="secondary" onClick={() => update(noFilters)}>Limpar filtros</button>
+            </>
+          ) : (
+            <>
+              <h2>Você viu todos por aqui</h2>
+              <p className="muted">Novos pets aparecem quando outros donos se cadastram. Volte mais tarde.</p>
+            </>
+          )}
         </div>
       )}
+      {showFilters && <FilterSheet value={filters} total={visible.length} hasOrigin={origin != null} onChange={update} onClose={() => setShowFilters(false)} />}
       {match && (
         <div className="overlay" onClick={() => setMatch(null)}>
           {CONFETTI.map((c, i) => (
