@@ -51,8 +51,6 @@ export function distanceLabel(km: number | null): string | null {
   return `a ${Math.round(km / 5) * 5} km`
 }
 
-export const RADII = [5, 10, 25, 50, 100, 250, 500]
-
 export function currentPosition(): Promise<Point> {
   return new Promise((res, rej) => {
     if (!navigator.geolocation) return rej(new Error('Este aparelho não oferece localização.'))

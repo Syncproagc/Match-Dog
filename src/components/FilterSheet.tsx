@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { CloseIcon } from './Icons'
 import { breedTypeLabel, purposeLabel, sexLabel, sociabilityLabel, speciesLabel } from '../lib/labels'
-import { RADII } from '../lib/geo'
 import { countFilters, noFilters, type Filters } from '../lib/filters'
 
 interface Props {
@@ -12,6 +11,8 @@ interface Props {
   onChange: (f: Filters) => void
   onClose: () => void
 }
+
+const MAX_RADIUS = 150
 
 type ListKey = 'species' | 'sex' | 'sociability' | 'purpose' | 'breed_type'
 const GROUPS: { key: ListKey; label: string; options: Record<string, string> }[] = [
@@ -53,12 +54,24 @@ export function FilterSheet({ value, total, hasOrigin, onChange, onClose }: Prop
         <div className="sheet-scroll filter-body">
           <fieldset className="field">
             <legend>Distância</legend>
-            <div className="chips">
-              <button type="button" disabled={!hasOrigin} aria-pressed={value.radiusKm == null} className={value.radiusKm == null ? 'chip on' : 'chip'} onClick={() => onChange({ ...value, radiusKm: null })}>Qualquer</button>
-              {RADII.map((km) => (
-                <button key={km} type="button" disabled={!hasOrigin} aria-pressed={value.radiusKm === km} className={value.radiusKm === km ? 'chip on' : 'chip'} onClick={() => onChange({ ...value, radiusKm: km })}>até {km} km</button>
-              ))}
+            <div className="range-head">
+              <output htmlFor="filter-radius" className="range-value">{value.radiusKm == null ? 'Sem limite' : value.radiusKm === 0 ? 'Mesmo local' : `Até ${value.radiusKm} km`}</output>
+              <button type="button" className="link" disabled={!hasOrigin || value.radiusKm == null} onClick={() => onChange({ ...value, radiusKm: null })}>Sem limite</button>
             </div>
+            <input
+              id="filter-radius"
+              className="range"
+              type="range"
+              min={0}
+              max={MAX_RADIUS}
+              step={1}
+              disabled={!hasOrigin}
+              aria-label="Distância máxima em quilômetros"
+              value={value.radiusKm ?? MAX_RADIUS}
+              style={{ '--pct': `${((value.radiusKm ?? MAX_RADIUS) / MAX_RADIUS) * 100}%` } as React.CSSProperties}
+              onChange={(e) => onChange({ ...value, radiusKm: Number(e.target.value) })}
+            />
+            <div className="range-scale" aria-hidden><span>0 km</span><span>75 km</span><span>150 km</span></div>
             {!hasOrigin && <p className="muted filter-note">Defina a localização do seu pet em "Meu pet" para filtrar por distância.</p>}
           </fieldset>
           {GROUPS.map((g) => (
