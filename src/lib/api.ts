@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 import { demoPet, seedPets } from './mockData'
-import type { Pet, PetInput, User } from './types'
+import type { Message, Pet, PetInput, User } from './types'
 
 export const isDemo = !supabase
 
@@ -10,10 +10,11 @@ interface DemoState {
   myPet: Pet | null
   swipes: Record<string, boolean>
   matches: string[]
+  messages: Message[]
 }
 
 const KEY = 'match-dog-demo'
-const empty: DemoState = { user: null, myPet: null, swipes: {}, matches: [] }
+const empty: DemoState = { user: null, myPet: null, swipes: {}, matches: [], messages: [] }
 
 function load(): DemoState {
   try {
@@ -88,7 +89,7 @@ export async function signOut() {
 }
 
 export async function getMyPet(user: User): Promise<Pet | null> {
-  if (!supabase) return load().myPet
+  if (!supabase) { const p = load().myPet; return p && { ...p, temperament: p.temperament ?? [], photos: p.photos ?? [], lat: p.lat ?? null, lng: p.lng ?? null } }
   const { data, error } = await supabase
     .from('pets')
     .select('*')
@@ -100,10 +101,11 @@ export async function getMyPet(user: User): Promise<Pet | null> {
   return data
 }
 
-export async function savePet(user: User, input: PetInput, photo: File | null, existing: Pet | null): Promise<Pet> {
+export async function savePet(user: User, input: PetInput, photo: File | null, existing: Pet | null, extra: File[] = []): Promise<Pet> {
   if (!supabase) {
     const photo_url = photo ? await fileToDataUrl(photo) : input.photo_url
-    const pet: Pet = { ...input, photo_url, id: existing?.id ?? 'my-pet', owner_id: user.id }
+    const photos = [...input.photos, ...(await Promise.all(extra.map(fileToDataUrl)))]
+    const pet: Pet = { ...input, photo_url, photos, id: existing?.id ?? 'my-pet', owner_id: user.id }
     save({ ...load(), myPet: pet })
     return pet
   }
@@ -114,7 +116,14 @@ export async function savePet(user: User, input: PetInput, photo: File | null, e
     if (up.error) throw up.error
     photo_url = supabase.storage.from('pet-photos').getPublicUrl(path).data.publicUrl
   }
-  const row = { ...input, photo_url, owner_id: user.id }
+  const photos = [...input.photos]
+  for (const f of extra) {
+    const path = `${user.id}/${crypto.randomUUID()}-${f.name}`
+    const up = await supabase.storage.from('pet-photos').upload(path, f)
+    if (up.error) throw up.error
+    photos.push(supabase.storage.from('pet-photos').getPublicUrl(path).data.publicUrl)
+  }
+  const row = { ...input, photo_url, photos, owner_id: user.id }
   const q = existing
     ? supabase.from('pets').update(row).eq('id', existing.id)
     : supabase.from('pets').insert(row)
@@ -177,4 +186,77 @@ export async function getMatches(myPet: Pet): Promise<Pet[]> {
     .order('created_at', { ascending: false })
   if (error) throw error
   return (data as unknown as { pet_a: Pet; pet_b: Pet }[]).map((m) => (m.pet_a.id === myPet.id ? m.pet_b : m.pet_a))
+}
+
+// ---------- Chat ----------
+const pairKey = (a: string, b: string) => [a, b].sort().join(':')
+const inPair = (m: Message, a: string, b: string) => pairKey(m.from_pet_id, m.to_pet_id) === pairKey(a, b)
+
+// No modo demo, o outro dono é simulado com respostas prontas
+const DEMO_REPLIES = [
+  'Oi! Que bom que deu match.',
+  'Vamos marcar um passeio no parque?',
+  'Sábado de manhã seria bom para a gente.',
+  'Combinado. Leve água para os dois.',
+  'Tenho certeza de que eles vão se dar bem.',
+]
+
+function demoReply(myPet: Pet, other: Pet) {
+  setTimeout(() => {
+    const s = load()
+    const count = s.messages.filter((m) => m.from_pet_id === other.id && inPair(m, myPet.id, other.id)).length
+    s.messages.push({
+      id: crypto.randomUUID(),
+      from_pet_id: other.id,
+      to_pet_id: myPet.id,
+      body: DEMO_REPLIES[count % DEMO_REPLIES.length],
+      created_at: new Date().toISOString(),
+    })
+    save(s)
+  }, 1500 + Math.random() * 1500)
+}
+
+export async function getMessages(myPet: Pet, other: Pet): Promise<Message[]> {
+  if (!supabase) return load().messages.filter((m) => inPair(m, myPet.id, other.id))
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .or(`and(from_pet_id.eq.${myPet.id},to_pet_id.eq.${other.id}),and(from_pet_id.eq.${other.id},to_pet_id.eq.${myPet.id})`)
+    .order('created_at')
+  if (error) throw error
+  return data
+}
+
+export async function sendMessage(myPet: Pet, other: Pet, body: string): Promise<Message> {
+  if (!supabase) {
+    const s = load()
+    const msg: Message = { id: crypto.randomUUID(), from_pet_id: myPet.id, to_pet_id: other.id, body, created_at: new Date().toISOString() }
+    s.messages.push(msg)
+    save(s)
+    demoReply(myPet, other)
+    return msg
+  }
+  const { data, error } = await supabase.from('messages').insert({ from_pet_id: myPet.id, to_pet_id: other.id, body }).select().single()
+  if (error) throw error
+  return data
+}
+
+/** Última mensagem de cada conversa, indexada pelo id do outro pet */
+export async function getLastMessages(myPet: Pet): Promise<Record<string, Message>> {
+  let all: Message[]
+  if (!supabase) {
+    all = load().messages.filter((m) => m.from_pet_id === myPet.id || m.to_pet_id === myPet.id)
+  } else {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .or(`from_pet_id.eq.${myPet.id},to_pet_id.eq.${myPet.id}`)
+      .order('created_at', { ascending: false })
+      .limit(200)
+    if (error) throw error
+    all = [...data].reverse()
+  }
+  const last: Record<string, Message> = {}
+  for (const m of all) last[m.from_pet_id === myPet.id ? m.to_pet_id : m.from_pet_id] = m
+  return last
 }

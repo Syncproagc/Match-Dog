@@ -1,22 +1,42 @@
 import { useEffect, useState } from 'react'
 import { SwipeCard } from '../components/SwipeCard'
 import { BrandMark } from '../components/BrandMark'
+import { FilterSheet } from '../components/FilterSheet'
+import { FilterIcon, PawIcon } from '../components/Icons'
+import { distanceKm, distanceLabel, petPoint } from '../lib/geo'
+import { countFilters, loadFilters, matchesFilters, noFilters, saveFilters, type Filters } from '../lib/filters'
 import { getCandidates, swipe } from '../lib/api'
 import type { Pet } from '../lib/types'
+
+const CONFETTI = Array.from({ length: 28 }, (_, i) => ({ left: (i * 37) % 100, delay: (i % 7) * 0.12, dur: 2.4 + (i % 5) * 0.35, hue: i % 4, rot: (i * 53) % 360 }))
 
 export function Discover({ myPet }: { myPet: Pet }) {
   const [queue, setQueue] = useState<Pet[] | null>(null)
   const [match, setMatch] = useState<Pet | null>(null)
   const [error, setError] = useState('')
+  const [filters, setFilters] = useState<Filters>(loadFilters)
+  const [showFilters, setShowFilters] = useState(false)
 
   useEffect(() => {
     getCandidates(myPet).then(setQueue, (e) => setError(e.message))
   }, [myPet])
 
+  const update = (f: Filters) => {
+    setFilters(f)
+    saveFilters(f)
+  }
+  const origin = petPoint(myPet)
+  const visible = queue?.filter((p) => matchesFilters(p, filters, origin)) ?? []
+  const distanceTo = (p: Pet) => {
+    const pt = petPoint(p)
+    return origin && pt ? distanceLabel(distanceKm(origin, pt)) : null
+  }
+  const active = countFilters(filters)
+
   const onSwipe = async (liked: boolean) => {
-    if (!queue?.length) return
-    const [current, ...rest] = queue
-    setQueue(rest)
+    const current = visible[0]
+    if (!current) return
+    setQueue((q) => q?.filter((p) => p.id !== current.id) ?? null)
     try {
       if (await swipe(myPet, current, liked)) setMatch(current)
     } catch (e) {
@@ -36,17 +56,39 @@ export function Discover({ myPet }: { myPet: Pet }) {
 
   return (
     <div className="discover">
-      {queue.length ? (
-        <SwipeCard key={queue[0].id} pet={queue[0]} next={queue[1]} onSwipe={onSwipe} />
+      <div className="discover-bar">
+        <p className="muted">{visible.length} {visible.length === 1 ? 'pet para descobrir' : 'pets para descobrir'}</p>
+        <button type="button" className={active ? 'filter-btn on' : 'filter-btn'} onClick={() => setShowFilters(true)}>
+          <FilterIcon /> Filtros{active > 0 && <span className="badge">{active}</span>}
+        </button>
+      </div>
+      {visible.length ? (
+        <SwipeCard key={visible[0].id} pet={visible[0]} next={visible[1]} distance={distanceTo(visible[0])} onSwipe={onSwipe} />
       ) : (
         <div className="empty">
-          <BrandMark size={72} />
-          <h2>Você viu todos por aqui</h2>
-          <p className="muted">Novos pets aparecem quando outros donos se cadastram. Volte mais tarde.</p>
+          <div className="empty-art" aria-hidden>
+            <span /><span /><span><PawIcon /></span>
+          </div>
+          {queue.length ? (
+            <>
+              <h2>Ninguém com esses filtros</h2>
+              <p className="muted">{queue.length} {queue.length === 1 ? 'pet está' : 'pets estão'} escondido{queue.length === 1 ? '' : 's'} pelos filtros. Afrouxe algum para ver mais.</p>
+              <button type="button" className="secondary" onClick={() => update(noFilters)}>Limpar filtros</button>
+            </>
+          ) : (
+            <>
+              <h2>Você viu todos por aqui</h2>
+              <p className="muted">Novos pets aparecem quando outros donos se cadastram. Volte mais tarde.</p>
+            </>
+          )}
         </div>
       )}
+      {showFilters && <FilterSheet value={filters} total={visible.length} hasOrigin={origin != null} onChange={update} onClose={() => setShowFilters(false)} />}
       {match && (
         <div className="overlay" onClick={() => setMatch(null)}>
+          {CONFETTI.map((c, i) => (
+            <i key={i} className={`confetti c${c.hue}`} style={{ left: `${c.left}%`, animationDelay: `${c.delay}s`, animationDuration: `${c.dur}s`, rotate: `${c.rot}deg` }} />
+          ))}
           <BrandMark size={84} tone="light" />
           <h1>Deu match!</h1>
           <div className="match-photos">
@@ -54,7 +96,7 @@ export function Discover({ myPet }: { myPet: Pet }) {
             <img src={match.photo_url ?? ''} alt={match.name} className="tilt-r" />
           </div>
           <p>{myPet.name} e {match.name} se curtiram. Que tal marcar um passeio?</p>
-          <button className="primary">Continuar descobrindo</button>
+          <button className="primary" onClick={() => setMatch(null)}>Continuar descobrindo</button>
         </div>
       )}
     </div>

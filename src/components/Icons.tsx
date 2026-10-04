@@ -60,3 +60,36 @@ export const CameraIcon = () => (
     <circle cx="12" cy="12.5" r="3.4" />
   </svg>
 )
+
+export const InfoIcon = () => (
+  <svg {...base} width={20} height={20}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 11v5M12 8h.01" />
+  </svg>
+)
+
+export const PlusIcon = () => (
+  <svg {...base} width={22} height={22}>
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+)
+
+export const FilterIcon = () => (
+  <svg {...base} width={20} height={20}>
+    <path d="M4 7h10M18 7h2M4 17h2M10 17h10" />
+    <circle cx="16" cy="7" r="2" />
+    <circle cx="8" cy="17" r="2" />
+  </svg>
+)
+
+export const BackIcon = () => (
+  <svg {...base} width={22} height={22}>
+    <path d="M15 5l-7 7 7 7" />
+  </svg>
+)
+
+export const SendIcon = () => (
+  <svg {...base} width={20} height={20}>
+    <path d="M4 12l16-8-6 16-3-7z" />
+  </svg>
+)
