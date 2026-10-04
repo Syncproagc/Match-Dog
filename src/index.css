@@ -530,3 +530,15 @@ input.range:disabled { opacity: 0.4; cursor: not-allowed; }
 @media (hover: none) { .gallery-arrow { display: none; } }
 
 .filter-note-box { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+
+/* Descobrir: foto maior, botões sobre a foto */
+.discover { padding-inline: 12px; }
+.discover-bar { max-width: 480px; padding-inline: 8px; }
+.deck-wrap { max-width: 480px; gap: 0; }
+.deck { aspect-ratio: auto; max-height: none; height: clamp(440px, calc(100dvh - 232px), 780px); }
+.card-info { margin-bottom: 104px; }
+.actions.on-photo { position: absolute; inset: auto 0 18px 0; z-index: 3; justify-content: center; gap: 36px; pointer-events: none; }
+.actions.on-photo .round { pointer-events: auto; background: color-mix(in srgb, var(--surface) 82%, transparent); box-shadow: inset 0 0 0 1px var(--glass-line), 0 16px 30px -10px rgb(0 0 0 / 0.5); }
+.actions.on-photo .round.like { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 80%, #f2b25c), var(--accent)); }
+.card-info .eyebrow { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-height: 700px) { .card-info .tags li:nth-child(n+3) { display: none; } }
