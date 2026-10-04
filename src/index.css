@@ -445,3 +445,21 @@ nav button:active { transform: scale(0.94); }
 .thumb button { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; border: 0; display: grid; place-items: center; color: #fff; background: rgb(20 12 8 / 0.6); }
 .thumb.add { display: grid; place-items: center; cursor: pointer; color: var(--muted); background: var(--glass); box-shadow: inset 0 0 0 1.5px var(--border); transition: color 0.2s, box-shadow 0.2s; }
 .thumb.add:hover { color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
+
+/* Filtros */
+.discover-bar { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.discover-bar p { margin: 0; font-size: 14px; }
+.filter-btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; border: 0; font-size: 14px; font-weight: 600; background: var(--glass); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px var(--glass-line); transition: transform 0.2s var(--ease), color 0.2s; }
+.filter-btn:hover { color: var(--accent); }
+.filter-btn:active { transform: scale(0.96); }
+.filter-btn.on { color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.badge { min-width: 20px; height: 20px; padding: 0 6px; display: inline-grid; place-items: center; border-radius: 999px; font-size: 12px; color: var(--accent-ink); background: var(--accent); font-variant-numeric: tabular-nums; }
+.filter-sheet { max-height: 88dvh; }
+.filter-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 6px; }
+.filter-head h2 { font-size: 26px; font-weight: 800; }
+.icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 0; display: grid; place-items: center; background: var(--sunken); }
+.filter-body { display: flex; flex-direction: column; gap: 18px; padding: 12px 20px 20px; }
+.filter-note { font-size: 13px; margin: 0; }
+.filter-actions { justify-content: space-between; align-items: center; }
+.filter-actions .link:disabled { opacity: 0.4; cursor: default; }
+.discover .empty .secondary { margin-top: 8px; align-self: center; }
