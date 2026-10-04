@@ -56,7 +56,7 @@ export function FilterSheet({ value, total, hasOrigin, onChange, onClose }: Prop
             <legend>Distância</legend>
             <div className="range-head">
               <output htmlFor="filter-radius" className="range-value">{value.radiusKm == null ? 'Sem limite' : value.radiusKm === 0 ? 'Mesmo local' : `Até ${value.radiusKm} km`}</output>
-              <button type="button" className="link" disabled={!hasOrigin || value.radiusKm == null} onClick={() => onChange({ ...value, radiusKm: null })}>Sem limite</button>
+              {value.radiusKm != null && <button type="button" className="link" onClick={() => onChange({ ...value, radiusKm: null })}>Sem limite</button>}
             </div>
             <input
               id="filter-radius"

@@ -512,3 +512,17 @@ input.range:disabled { opacity: 0.4; cursor: not-allowed; }
 .send:hover { transform: scale(1.06); }
 .send:active { transform: scale(0.94); }
 .send:disabled { opacity: 0.45; transform: none; box-shadow: none; }
+
+.chat-profile { all: unset; flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; cursor: pointer; border-radius: var(--r-sm); }
+.chat-profile:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 4px; }
+.chat-profile:hover .chat-who strong { color: var(--accent); }
+
+/* Galeria: arrastar com o mouse e setas */
+.gallery-track { touch-action: pan-x pan-y; cursor: grab; outline-offset: -3px; }
+.gallery-track.dragging { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+.gallery-arrow { position: absolute; top: 50%; translate: 0 -50%; width: 40px; height: 40px; border-radius: 50%; border: 0; display: grid; place-items: center; color: #fff; background: rgb(20 12 8 / 0.45); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.2); transition: background 0.2s, transform 0.2s var(--ease); }
+.gallery-arrow:hover { background: rgb(20 12 8 / 0.65); }
+.gallery-arrow:active { transform: scale(0.92); }
+.gallery-arrow.prev { left: 10px; }
+.gallery-arrow.next { right: 10px; rotate: 180deg; }
+@media (hover: none) { .gallery-arrow { display: none; } }

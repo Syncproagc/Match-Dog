@@ -4,6 +4,7 @@ import { getMessages, isDemo, sendMessage } from '../lib/api'
 import { breedLabel } from '../lib/labels'
 import type { Message, Pet } from '../lib/types'
 import { BackIcon, SendIcon } from './Icons'
+import { PetSheet } from './PetSheet'
 
 const time = (iso: string) => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
@@ -12,6 +13,11 @@ export function Chat({ myPet, other, onBack }: { myPet: Pet; other: Pet; onBack:
   const [text, setText] = useState('')
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
+  const [profile, setProfile] = useState(false)
+  const profileRef = useRef(false)
+  useEffect(() => {
+    profileRef.current = profile
+  }, [profile])
   const endRef = useRef<HTMLDivElement>(null)
 
   // Atualiza a conversa de tempos em tempos para mostrar respostas novas
@@ -27,7 +33,7 @@ export function Chat({ myPet, other, onBack }: { myPet: Pet; other: Pet; onBack:
   }, [myPet, other])
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onBack()
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && !profileRef.current && onBack()
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     window.addEventListener('keydown', onKey)
@@ -63,11 +69,13 @@ export function Chat({ myPet, other, onBack }: { myPet: Pet; other: Pet; onBack:
     <section className="chat" role="dialog" aria-modal="true" aria-label={`Conversa com ${other.name}`}>
       <header className="chat-head">
         <button className="icon-btn" aria-label="Voltar para os matches" onClick={onBack}><BackIcon /></button>
-        <img className="avatar" src={other.photo_url ?? ''} alt="" />
-        <div className="chat-who">
-          <strong>{other.name}</strong>
-          <span className="muted">{[breedLabel(other), other.city].filter(Boolean).join(' · ')}</span>
-        </div>
+        <button type="button" className="chat-profile" aria-label={`Ver perfil de ${other.name}`} onClick={() => setProfile(true)}>
+          <img className="avatar" src={other.photo_url ?? ''} alt="" />
+          <span className="chat-who">
+            <strong>{other.name}</strong>
+            <span className="muted">{[breedLabel(other), other.city].filter(Boolean).join(' · ')}</span>
+          </span>
+        </button>
       </header>
       <div className="chat-list" aria-live="polite">
         {messages && messages.length === 0 && (
@@ -86,6 +94,7 @@ export function Chat({ myPet, other, onBack }: { myPet: Pet; other: Pet; onBack:
         <input id="chat-text" aria-label="Mensagem" placeholder={`Mensagem para ${other.name}`} maxLength={1000} autoComplete="off" value={text} onChange={(e) => setText(e.target.value)} />
         <button type="submit" className="send" aria-label="Enviar" disabled={!text.trim() || sending}><SendIcon /></button>
       </form>
+      {profile && <PetSheet pet={other} onClose={() => setProfile(false)} />}
     </section>,
     document.body,
   )
