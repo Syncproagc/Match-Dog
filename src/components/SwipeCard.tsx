@@ -9,10 +9,11 @@ const THRESHOLD = 110
 interface Props {
   pet: Pet
   next?: Pet
+  distance?: string | null
   onSwipe: (liked: boolean) => void
 }
 
-export function SwipeCard({ pet, next, onSwipe }: Props) {
+export function SwipeCard({ pet, next, distance, onSwipe }: Props) {
   const [dx, setDx] = useState(0)
   const [leaving, setLeaving] = useState<null | boolean>(null)
   const [dragging, setDragging] = useState(false)
@@ -87,16 +88,16 @@ export function SwipeCard({ pet, next, onSwipe }: Props) {
                 ))}
               </ul>
             )}
-            {pet.city && (
+            {(pet.city || distance) && (
               <p className="city">
-                <PinIcon /> {pet.city}
+                <PinIcon /> {[pet.city, distance].filter(Boolean).join(' · ')}
               </p>
             )}
             {pet.bio && <p className="bio">{pet.bio}</p>}
           </div>
         </article>
       </div>
-      {open && <PetSheet pet={pet} onClose={() => setOpen(false)} onDecide={(liked) => { setOpen(false); finish(liked) }} />}
+      {open && <PetSheet pet={pet} distance={distance} onClose={() => setOpen(false)} onDecide={(liked) => { setOpen(false); finish(liked) }} />}
       <div className="actions">
         <button className="round nope" aria-label="Passar" onClick={() => finish(false)}>
           <CloseIcon />

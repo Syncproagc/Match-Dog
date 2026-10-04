@@ -463,3 +463,11 @@ nav button:active { transform: scale(0.94); }
 .filter-actions { justify-content: space-between; align-items: center; }
 .filter-actions .link:disabled { opacity: 0.4; cursor: default; }
 .discover .empty .secondary { margin-top: 8px; align-self: center; }
+
+/* Localização */
+.loc-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+button.secondary.small { padding: 9px 16px; font-size: 14px; }
+.loc-ok { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; color: var(--like); }
+.loc-ok .link { padding: 2px 6px; font-size: 13px; }
+.loc-hint { font-size: 13px; margin: 0; }
+.chip:disabled { opacity: 0.45; cursor: not-allowed; }

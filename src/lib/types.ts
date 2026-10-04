@@ -13,6 +13,8 @@ export interface Pet {
   age_years: number | null
   sex: Sex | null
   city: string | null
+  lat: number | null
+  lng: number | null
   bio: string | null
   temperament: string[]
   purpose: Purpose | null

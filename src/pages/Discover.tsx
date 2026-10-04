@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { SwipeCard } from '../components/SwipeCard'
 import { FilterSheet } from '../components/FilterSheet'
 import { FilterIcon, PawIcon } from '../components/Icons'
+import { distanceKm, distanceLabel, petPoint } from '../lib/geo'
 import { countFilters, loadFilters, matchesFilters, noFilters, saveFilters, type Filters } from '../lib/filters'
 import { getCandidates, swipe } from '../lib/api'
 import type { Pet } from '../lib/types'
@@ -23,7 +24,12 @@ export function Discover({ myPet }: { myPet: Pet }) {
     setFilters(f)
     saveFilters(f)
   }
-  const visible = queue?.filter((p) => matchesFilters(p, filters)) ?? []
+  const origin = petPoint(myPet)
+  const visible = queue?.filter((p) => matchesFilters(p, filters, origin)) ?? []
+  const distanceTo = (p: Pet) => {
+    const pt = petPoint(p)
+    return origin && pt ? distanceLabel(distanceKm(origin, pt)) : null
+  }
   const active = countFilters(filters)
 
   const onSwipe = async (liked: boolean) => {
@@ -56,7 +62,7 @@ export function Discover({ myPet }: { myPet: Pet }) {
         </button>
       </div>
       {visible.length ? (
-        <SwipeCard key={visible[0].id} pet={visible[0]} next={visible[1]} onSwipe={onSwipe} />
+        <SwipeCard key={visible[0].id} pet={visible[0]} next={visible[1]} distance={distanceTo(visible[0])} onSwipe={onSwipe} />
       ) : (
         <div className="empty">
           <div className="empty-art" aria-hidden>
@@ -76,7 +82,7 @@ export function Discover({ myPet }: { myPet: Pet }) {
           )}
         </div>
       )}
-      {showFilters && <FilterSheet value={filters} total={visible.length} onChange={update} onClose={() => setShowFilters(false)} />}
+      {showFilters && <FilterSheet value={filters} total={visible.length} hasOrigin={origin != null} onChange={update} onClose={() => setShowFilters(false)} />}
       {match && (
         <div className="overlay" onClick={() => setMatch(null)}>
           {CONFETTI.map((c, i) => (

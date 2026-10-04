@@ -88,7 +88,7 @@ export async function signOut() {
 }
 
 export async function getMyPet(user: User): Promise<Pet | null> {
-  if (!supabase) { const p = load().myPet; return p && { ...p, temperament: p.temperament ?? [], photos: p.photos ?? [] } }
+  if (!supabase) { const p = load().myPet; return p && { ...p, temperament: p.temperament ?? [], photos: p.photos ?? [], lat: p.lat ?? null, lng: p.lng ?? null } }
   const { data, error } = await supabase
     .from('pets')
     .select('*')

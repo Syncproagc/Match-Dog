@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { savePet } from '../lib/api'
-import { CameraIcon, CloseIcon, PlusIcon } from '../components/Icons'
+import { CameraIcon, CloseIcon, PinIcon, PlusIcon } from '../components/Icons'
+import { CITIES, cityPoint, currentPosition } from '../lib/geo'
 import { TEMPERAMENTS, breedTypeLabel, purposeLabel, sociabilityLabel } from '../lib/labels'
 import type { Pet, PetInput, User } from '../lib/types'
 
@@ -41,6 +42,8 @@ export function PetForm({ user, pet, onSaved }: Props) {
     age_years: pet?.age_years ?? null,
     sex: pet?.sex ?? null,
     city: pet?.city ?? '',
+    lat: pet?.lat ?? null,
+    lng: pet?.lng ?? null,
     bio: pet?.bio ?? '',
     photo_url: pet?.photo_url ?? null,
     photos: pet?.photos ?? [],
@@ -59,12 +62,30 @@ export function PetForm({ user, pet, onSaved }: Props) {
   const [extra, setExtra] = useState<File[]>([])
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [locating, setLocating] = useState(false)
+  const [locError, setLocError] = useState('')
 
   const set = <K extends keyof PetInput>(k: K, v: PetInput[K]) => setForm((f) => ({ ...f, [k]: v }))
   const toggleTemper = (t: string) => set('temperament', form.temperament.includes(t) ? form.temperament.filter((x) => x !== t) : [...form.temperament, t])
   const preview = photo ? URL.createObjectURL(photo) : form.photo_url
   const room = MAX_EXTRA - form.photos.length - extra.length
   const addExtra = (files: FileList | null) => files && setExtra((x) => [...x, ...Array.from(files)].slice(0, MAX_EXTRA - form.photos.length))
+  const setCity = (city: string) => {
+    const pt = cityPoint(city)
+    setForm((f) => ({ ...f, city, ...(pt ? { lat: pt.lat, lng: pt.lng } : {}) }))
+  }
+  const useMyLocation = async () => {
+    setLocating(true)
+    setLocError('')
+    try {
+      const pt = await currentPosition()
+      setForm((f) => ({ ...f, lat: pt.lat, lng: pt.lng }))
+    } catch (e) {
+      setLocError((e as Error).message)
+    } finally {
+      setLocating(false)
+    }
+  }
   const mixed = form.breed_type === 'mixed'
   const purebred = form.breed_type === 'purebred'
   const female = form.sex === 'female'
@@ -140,10 +161,23 @@ export function PetForm({ user, pet, onSaved }: Props) {
           <label htmlFor="pet-age">Idade</label>
           <input type="number" min={0} id="pet-age" placeholder="Anos" value={form.age_years ?? ''} onChange={(e) => set('age_years', e.target.value === '' ? null : Number(e.target.value))} />
         </div>
-        <div className="field grow">
-          <label htmlFor="pet-city">Cidade</label>
-          <input id="pet-city" placeholder="Onde ele mora" value={form.city ?? ''} onChange={(e) => set('city', e.target.value)} />
+      </div>
+      <div className="field">
+        <label htmlFor="pet-city">Cidade</label>
+        <input id="pet-city" list="city-list" placeholder="Digite ou escolha sua cidade" value={form.city ?? ''} onChange={(e) => setCity(e.target.value)} />
+        <datalist id="city-list">{Object.keys(CITIES).map((c) => <option key={c} value={c} />)}</datalist>
+        <div className="loc-row">
+          <button type="button" className="secondary small" disabled={locating} onClick={useMyLocation}>{locating ? 'Buscando...' : 'Usar minha localização'}</button>
+          {form.lat != null ? (
+            <span className="loc-ok"><PinIcon /> Localização definida
+              <button type="button" className="link" onClick={() => setForm((f) => ({ ...f, lat: null, lng: null }))}>Remover</button>
+            </span>
+          ) : (
+            <span className="muted loc-hint">Sem localização, o filtro de distância não funciona.</span>
+          )}
         </div>
+        {locError && <p className="error" role="alert">{locError}</p>}
+        <p className="muted loc-hint">Outros donos veem só uma distância aproximada, nunca o endereço.</p>
       </div>
 
       <h2 className="form-section">Raça e registro</h2>

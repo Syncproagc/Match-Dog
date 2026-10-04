@@ -7,12 +7,13 @@ import { speciesLabel } from '../lib/labels'
 
 interface Props {
   pet: Pet
+  distance?: string | null
   onClose: () => void
   onDecide: (liked: boolean) => void
 }
 
 // Ficha completa do pet: galeria, descrição e todos os dados informados pelo dono
-export function PetSheet({ pet, onClose, onDecide }: Props) {
+export function PetSheet({ pet, distance, onClose, onDecide }: Props) {
   const photos = [pet.photo_url, ...(pet.photos ?? [])].filter((p): p is string => Boolean(p))
   const [index, setIndex] = useState(0)
   const closeRef = useRef<HTMLButtonElement>(null)
@@ -53,7 +54,7 @@ export function PetSheet({ pet, onClose, onDecide }: Props) {
           <div className="sheet-body">
             <p className="eyebrow muted">{speciesLabel[pet.species]}</p>
             <h2 className="sheet-name">{pet.name}{pet.age_years != null && <small>{pet.age_years}</small>}</h2>
-            {pet.city && <p className="city muted"><PinIcon /> {pet.city}</p>}
+            {(pet.city || distance) && <p className="city muted"><PinIcon /> {[pet.city, distance].filter(Boolean).join(' · ')}</p>}
             {pet.temperament?.length > 0 && (
               <ul className="chips-static">{pet.temperament.map((t) => <li key={t}>{t}</li>)}</ul>
             )}

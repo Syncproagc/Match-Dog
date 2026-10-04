@@ -2,11 +2,13 @@ import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { CloseIcon } from './Icons'
 import { breedTypeLabel, purposeLabel, sexLabel, sociabilityLabel, speciesLabel } from '../lib/labels'
+import { RADII } from '../lib/geo'
 import { countFilters, noFilters, type Filters } from '../lib/filters'
 
 interface Props {
   value: Filters
   total: number
+  hasOrigin: boolean
   onChange: (f: Filters) => void
   onClose: () => void
 }
@@ -20,7 +22,7 @@ const GROUPS: { key: ListKey; label: string; options: Record<string, string> }[]
   { key: 'breed_type', label: 'Tipo de raça', options: breedTypeLabel },
 ]
 
-export function FilterSheet({ value, total, onChange, onClose }: Props) {
+export function FilterSheet({ value, total, hasOrigin, onChange, onClose }: Props) {
   const closeRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -49,6 +51,16 @@ export function FilterSheet({ value, total, onChange, onClose }: Props) {
           <button ref={closeRef} className="icon-btn" aria-label="Fechar" onClick={onClose}><CloseIcon size={20} /></button>
         </header>
         <div className="sheet-scroll filter-body">
+          <fieldset className="field">
+            <legend>Distância</legend>
+            <div className="chips">
+              <button type="button" disabled={!hasOrigin} aria-pressed={value.radiusKm == null} className={value.radiusKm == null ? 'chip on' : 'chip'} onClick={() => onChange({ ...value, radiusKm: null })}>Qualquer</button>
+              {RADII.map((km) => (
+                <button key={km} type="button" disabled={!hasOrigin} aria-pressed={value.radiusKm === km} className={value.radiusKm === km ? 'chip on' : 'chip'} onClick={() => onChange({ ...value, radiusKm: km })}>até {km} km</button>
+              ))}
+            </div>
+            {!hasOrigin && <p className="muted filter-note">Defina a localização do seu pet em "Meu pet" para filtrar por distância.</p>}
+          </fieldset>
           {GROUPS.map((g) => (
             <fieldset className="field" key={g.key}>
               <legend>{g.label}</legend>
