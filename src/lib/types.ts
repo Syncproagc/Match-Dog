@@ -44,3 +44,18 @@ export interface Message {
   body: string
   created_at: string
 }
+
+export interface Settings {
+  notify_matches: boolean
+  notify_messages: boolean
+}
+
+export type NotificationItem =
+  | { kind: 'match'; pet: Pet }
+  | { kind: 'message'; pet: Pet; count: number; last: Message }
+
+export interface Notifications {
+  /** Mensagens não lidas somadas a matches ainda não abertos */
+  count: number
+  items: NotificationItem[]
+}

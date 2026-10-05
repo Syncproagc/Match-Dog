@@ -10,7 +10,7 @@ import type { Pet } from '../lib/types'
 
 const CONFETTI = Array.from({ length: 28 }, (_, i) => ({ left: (i * 37) % 100, delay: (i % 7) * 0.12, dur: 2.4 + (i % 5) * 0.35, hue: i % 4, rot: (i * 53) % 360 }))
 
-export function Discover({ myPet, onSetLocation }: { myPet: Pet; onSetLocation: () => void }) {
+export function Discover({ myPet, onSetLocation, onMatch }: { myPet: Pet; onSetLocation: () => void; onMatch?: (pet: Pet) => void }) {
   const [queue, setQueue] = useState<Pet[] | null>(null)
   const [match, setMatch] = useState<Pet | null>(null)
   const [error, setError] = useState('')
@@ -39,7 +39,10 @@ export function Discover({ myPet, onSetLocation }: { myPet: Pet; onSetLocation: 
     if (!current) return
     setQueue((q) => q?.filter((p) => p.id !== current.id) ?? null)
     try {
-      if (await swipe(myPet, current, liked)) setMatch(current)
+      if (await swipe(myPet, current, liked)) {
+        onMatch?.(current)
+        setMatch(current)
+      }
     } catch (e) {
       setError((e as Error).message)
     }

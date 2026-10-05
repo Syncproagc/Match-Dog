@@ -24,6 +24,10 @@ Para usar o Supabase de verdade, copie `.env.example` para `.env` e preencha `VI
 | `npm run lint` | Oxlint |
 | `npm run preview` | Serve o build localmente |
 
+## Conta, avisos e desfazer match
+
+Veja [`docs/NOTIFICATIONS.md`](docs/NOTIFICATIONS.md). A migração `0005` precisa ser aplicada no Supabase para essas telas funcionarem fora do modo demo.
+
 ## Identidade visual
 
-O símbolo, o logotipo, as cores, as fontes e o tom de voz estão em [`docs/BRAND.md`](docs/BRAND.md). No código, use `BrandMark` e `Wordmark` de `src/components/BrandMark.tsx`. Arquivos prontos para uso ficam em `public/brand/`.
+O símbolo, o logotipo, as cores, as fontes e o tom de voz estão em [`docs/BRAND.md`](docs/BRAND.md). Para ver tudo montado, abra [`docs/brand-guide.html`](docs/brand-guide.html) no navegador. No código, use `BrandMark` e `Wordmark` de `src/components/BrandMark.tsx`. Arquivos prontos para uso ficam em `public/brand/` (logos, símbolo e redes sociais) e `public/icons/` (ícones PNG).

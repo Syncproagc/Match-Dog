@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 import { demoPet, seedPets } from './mockData'
-import type { Message, Pet, PetInput, User } from './types'
+import type { Message, NotificationItem, Notifications, Pet, PetInput, Settings, User } from './types'
 
 export const isDemo = !supabase
 
@@ -11,10 +11,14 @@ interface DemoState {
   swipes: Record<string, boolean>
   matches: string[]
   messages: Message[]
+  /** Quando li cada conversa, indexado pelo id do outro pet */
+  reads: Record<string, string>
+  settings: Settings
 }
 
 const KEY = 'match-dog-demo'
-const empty: DemoState = { user: null, myPet: null, swipes: {}, matches: [], messages: [] }
+export const defaultSettings: Settings = { notify_matches: true, notify_messages: true }
+const empty: DemoState = { user: null, myPet: null, swipes: {}, matches: [], messages: [], reads: {}, settings: defaultSettings }
 
 function load(): DemoState {
   try {
@@ -259,4 +263,166 @@ export async function getLastMessages(myPet: Pet): Promise<Record<string, Messag
   const last: Record<string, Message> = {}
   for (const m of all) last[m.from_pet_id === myPet.id ? m.to_pet_id : m.from_pet_id] = m
   return last
+}
+
+// ---------- Notificações ----------
+/** Marca a conversa como lida até agora */
+export async function markRead(myPet: Pet, other: Pet) {
+  const read_at = new Date().toISOString()
+  if (!supabase) {
+    const s = load()
+    s.reads[other.id] = read_at
+    return save(s)
+  }
+  const { error } = await supabase.from('conversation_reads').upsert({ pet_id: myPet.id, other_pet_id: other.id, read_at })
+  if (error) throw error
+}
+
+/** Mensagens recebidas e o momento da última leitura de cada conversa */
+async function loadInbox(myPet: Pet): Promise<{ received: Message[]; reads: Record<string, string> }> {
+  if (!supabase) {
+    const s = load()
+    return { received: s.messages.filter((m) => m.to_pet_id === myPet.id), reads: s.reads }
+  }
+  const [msgs, reads] = await Promise.all([
+    supabase.from('messages').select('*').eq('to_pet_id', myPet.id).order('created_at', { ascending: false }).limit(200),
+    supabase.from('conversation_reads').select('other_pet_id, read_at').eq('pet_id', myPet.id),
+  ])
+  if (msgs.error) throw msgs.error
+  if (reads.error) throw reads.error
+  return { received: msgs.data, reads: Object.fromEntries(reads.data.map((r) => [r.other_pet_id, r.read_at])) }
+}
+
+/** Mensagens não lidas e matches que ainda não foram abertos */
+export async function getNotifications(myPet: Pet, settings: Settings): Promise<Notifications> {
+  const [matches, { received, reads }] = await Promise.all([getMatches(myPet), loadInbox(myPet)])
+  const unread: Record<string, Message[]> = {}
+  for (const m of received) {
+    const readAt = reads[m.from_pet_id]
+    if (!readAt || m.created_at > readAt) (unread[m.from_pet_id] ??= []).push(m)
+  }
+  const fresh: NotificationItem[] = []
+  const messages: NotificationItem[] = []
+  for (const pet of matches) {
+    const list = unread[pet.id]
+    if (list?.length) {
+      if (settings.notify_messages) {
+        const last = list.reduce((a, b) => (a.created_at > b.created_at ? a : b))
+        messages.push({ kind: 'message', pet, count: list.length, last })
+      }
+    } else if (!reads[pet.id] && settings.notify_matches) {
+      fresh.push({ kind: 'match', pet })
+    }
+  }
+  messages.sort((a, b) => (a.kind === 'message' && b.kind === 'message' ? b.last.created_at.localeCompare(a.last.created_at) : 0))
+  const items = [...fresh, ...messages]
+  const count = items.reduce((n, i) => n + (i.kind === 'message' ? i.count : 1), 0)
+  return { count, items }
+}
+
+// ---------- Desfazer match ----------
+/** Encerra o match, apaga a conversa dos dois e não mostra mais esse pet */
+export async function unmatch(myPet: Pet, other: Pet) {
+  if (!supabase) {
+    const s = load()
+    s.matches = s.matches.filter((id) => id !== other.id)
+    s.messages = s.messages.filter((m) => !inPair(m, myPet.id, other.id))
+    s.swipes[other.id] = false
+    delete s.reads[other.id]
+    return save(s)
+  }
+  const [a, b] = [myPet.id, other.id].sort()
+  const pair = `and(from_pet_id.eq.${myPet.id},to_pet_id.eq.${other.id}),and(from_pet_id.eq.${other.id},to_pet_id.eq.${myPet.id})`
+  const steps = [
+    await supabase.from('messages').delete().or(pair),
+    await supabase.from('matches').delete().eq('pet_a_id', a).eq('pet_b_id', b),
+    await supabase.from('swipes').upsert({ swiper_pet_id: myPet.id, target_pet_id: other.id, liked: false }),
+    await supabase.from('conversation_reads').delete().eq('pet_id', myPet.id).eq('other_pet_id', other.id),
+  ]
+  const failed = steps.find((r) => r.error)
+  if (failed?.error) throw failed.error
+}
+
+// ---------- Conta ----------
+export async function getSettings(user: User): Promise<Settings> {
+  if (!supabase) return { ...defaultSettings, ...load().settings }
+  const { data, error } = await supabase.from('user_settings').select('notify_matches, notify_messages').eq('user_id', user.id).maybeSingle()
+  if (error) throw error
+  return { ...defaultSettings, ...data }
+}
+
+export async function saveSettings(user: User, settings: Settings) {
+  if (!supabase) return save({ ...load(), settings })
+  const { error } = await supabase.from('user_settings').upsert({ user_id: user.id, ...settings, updated_at: new Date().toISOString() })
+  if (error) throw error
+}
+
+/** Retorna o usuário atualizado quando a troca vale na hora (modo demo) ou null quando depende de confirmação por e-mail */
+export async function changeEmail(user: User, email: string): Promise<User | null> {
+  if (!supabase) {
+    const next = { ...user, email }
+    save({ ...load(), user: next })
+    return next
+  }
+  const { error } = await supabase.auth.updateUser({ email })
+  if (error) throw error
+  return null
+}
+
+export async function changePassword(password: string) {
+  if (!supabase) return
+  const { error } = await supabase.auth.updateUser({ password })
+  if (error) throw error
+}
+
+/** Reúne tudo o que o app guarda sobre a conta, para o dono baixar */
+export async function exportMyData(user: User, myPet: Pet | null) {
+  let messages: Message[] = []
+  let matches: Pet[] = []
+  let settings: Settings = defaultSettings
+  if (myPet) {
+    matches = await getMatches(myPet)
+    if (!supabase) {
+      messages = load().messages.filter((m) => m.from_pet_id === myPet.id || m.to_pet_id === myPet.id)
+    } else {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .or(`from_pet_id.eq.${myPet.id},to_pet_id.eq.${myPet.id}`)
+        .order('created_at')
+      if (error) throw error
+      messages = data
+    }
+  }
+  settings = await getSettings(user)
+  return {
+    exportado_em: new Date().toISOString(),
+    conta: { id: user.id, email: user.email },
+    configuracoes: settings,
+    pet: myPet,
+    matches: matches.map((p) => ({ id: p.id, nome: p.name })),
+    mensagens: messages,
+  }
+}
+
+/** Apaga fotos e conta. Pets, swipes, matches e mensagens saem por cascata no banco. */
+export async function deleteAccount(user: User) {
+  if (!supabase) {
+    try {
+      localStorage.removeItem(KEY)
+    } catch {
+      /* ignore */
+    }
+    return
+  }
+  const bucket = supabase.storage.from('pet-photos')
+  const { data: files, error: listError } = await bucket.list(user.id, { limit: 1000 })
+  if (listError) throw listError
+  if (files.length) {
+    const { error } = await bucket.remove(files.map((f) => `${user.id}/${f.name}`))
+    if (error) throw error
+  }
+  const { error } = await supabase.rpc('delete_my_account')
+  if (error) throw error
+  await supabase.auth.signOut()
 }

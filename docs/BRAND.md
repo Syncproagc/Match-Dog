@@ -15,7 +15,15 @@ Dois cães face a face, com os focinhos se encontrando no centro, formam um cora
 | `mark-light.svg` | Símbolo com volume, em fundo coral ou escuro |
 | `mark-flat.svg` | Versão chapada, em fundo claro (adesivo, impressão, uma cor) |
 | `mark-flat-light.svg` | Versão chapada, em fundo coral ou escuro |
+| `logo.svg` | Logotipo completo em fundo claro (texto em curvas, não depende de fonte) |
+| `logo-light.svg` | Logotipo completo em fundo coral ou escuro |
 | `app-icon.svg` | Ícone do app, símbolo sobre coral (o `public/favicon.svg` é o mesmo desenho) |
+
+### Ícones PNG em `public/icons/`
+`apple-touch-icon.png` (180), `icon-192.png`, `icon-512.png` e `icon-maskable-512.png` (preenchimento total, para Android).
+
+### Redes sociais em `public/brand/social/`
+`avatar-1080.png`, `cover-1500x500.png`, `post-deu-match-1080.png` e `post-par-perfeito-1080.png`. A imagem de prévia de links é `public/og-image.png` (1200 × 630).
 
 ### Cuidados
 - Use a versão clara em fundo claro e a versão "light" em fundo coral ou escuro.
@@ -44,7 +52,13 @@ Amigo de parquinho: frases curtas, calor, humor leve, pouco emoji, tratamento po
 - Match: "Deu match! Que tal marcar um passeio?"
 - Sem resultados: "Você viu todos por aqui. Volte mais tarde."
 
+## Guia visual
+Abra [`brand-guide.html`](brand-guide.html) no navegador para ver logo, símbolo, cores, fontes, voz e aplicações.
+
+## Contraste
+Creme sobre `#e8735a` dá 2,8:1 e sobre `#d9583f` dá 3,7:1, abaixo dos 4,5:1 recomendados para texto pequeno. Use essas combinações só em texto grande ou em negrito. Para texto pequeno sobre coral, use café (`#1a1411`, 6,1:1).
+
 ## Pendências
 - Ajustar o centro do símbolo, onde os focinhos ficam apertados em tamanhos pequenos.
 - Confirmar tom de voz e paleta de apoio.
-- Gerar ícones PNG (180, 192 e 512 px) a partir de `app-icon.svg` para iOS e PWA.
+- Decidir se os botões do app passam a um coral mais escuro para cumprir o contraste de texto pequeno.
