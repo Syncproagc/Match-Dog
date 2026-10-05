@@ -83,9 +83,10 @@ export function SwipeCard({ pet, next, distance, onSwipe }: Props) {
             <h2>{pet.name}{pet.age_years != null && <small>{pet.age_years}</small>}</h2>
             {tags.length > 0 && (
               <ul className="tags">
-                {tags.map((t) => (
+                {tags.slice(0, 3).map((t) => (
                   <li key={t}>{t}</li>
                 ))}
+                {tags.length > 3 && <li>+{tags.length - 3}</li>}
               </ul>
             )}
             {(pet.city || distance) && (
@@ -93,19 +94,18 @@ export function SwipeCard({ pet, next, distance, onSwipe }: Props) {
                 <PinIcon /> {[pet.city, distance].filter(Boolean).join(' · ')}
               </p>
             )}
-            {pet.bio && <p className="bio">{pet.bio}</p>}
           </div>
         </article>
+        <div className="actions on-photo">
+          <button className="round nope" aria-label="Passar" onClick={() => finish(false)}>
+            <CloseIcon />
+          </button>
+          <button className="round like" aria-label="Curtir" onClick={() => finish(true)}>
+            <HeartIcon />
+          </button>
+        </div>
       </div>
       {open && <PetSheet pet={pet} distance={distance} onClose={() => setOpen(false)} onDecide={(liked) => { setOpen(false); finish(liked) }} />}
-      <div className="actions">
-        <button className="round nope" aria-label="Passar" onClick={() => finish(false)}>
-          <CloseIcon />
-        </button>
-        <button className="round like" aria-label="Curtir" onClick={() => finish(true)}>
-          <HeartIcon />
-        </button>
-      </div>
     </div>
   )
 }
