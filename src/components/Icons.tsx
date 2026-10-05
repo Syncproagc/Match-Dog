@@ -93,3 +93,25 @@ export const SendIcon = () => (
     <path d="M4 12l16-8-6 16-3-7z" />
   </svg>
 )
+
+export const BellIcon = () => (
+  <svg {...base}>
+    <path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z" />
+    <path d="M10 20.5a2.2 2.2 0 0 0 4 0" />
+  </svg>
+)
+
+export const UserIcon = () => (
+  <svg {...base}>
+    <circle cx="12" cy="8.5" r="3.6" />
+    <path d="M5 20a7 7 0 0 1 14 0" />
+  </svg>
+)
+
+export const MoreIcon = () => (
+  <svg {...base} width={20} height={20}>
+    <circle cx="5.5" cy="12" r="1.2" />
+    <circle cx="12" cy="12" r="1.2" />
+    <circle cx="18.5" cy="12" r="1.2" />
+  </svg>
+)
