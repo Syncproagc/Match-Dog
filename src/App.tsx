@@ -50,7 +50,7 @@ export default function App() {
         {!pet ? (
           <PetForm user={user} pet={null} onSaved={setPet} />
         ) : tab === 'discover' ? (
-          <Discover myPet={pet} />
+          <Discover myPet={pet} onSetLocation={() => { setTab('profile'); setEditing(true) }} />
         ) : tab === 'matches' ? (
           <Matches myPet={pet} />
         ) : !editing ? (
